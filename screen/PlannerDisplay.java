@@ -6,6 +6,7 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
+import java.awt.event.*;
 
 public class PlannerDisplay extends JFrame {
     private JTable table;
@@ -48,11 +49,12 @@ public class PlannerDisplay extends JFrame {
         DefaultTableModel model = new DefaultTableModel(rows.length, columns.length);
         model.setColumnIdentifiers(columns);
         table = new JTable(model);
+        setupTableInteraction();
         table.setRowHeight(40);
         for (int i = 0; i < rows.length; i++) {
             model.setValueAt(rows[i], i, 0);
         }
-
+        
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); // 가로 스크롤 활성화
 
@@ -102,7 +104,63 @@ public class PlannerDisplay extends JFrame {
         setVisible(true);
     }
 
-    private String getWeekText() {
+    private void setupTableInteraction() {
+		// 테이블 셀 클릭 관련 이벤트(조회 및 삭제 기능), 초기화 함수
+    	// 테이블 직접 수정 불가
+        table.setDefaultEditor(Object.class, null);
+
+        // 기존 리스너 제거 (중복 방지)
+        for (MouseListener listener : table.getMouseListeners()) {
+            table.removeMouseListener(listener);
+        }
+
+        // 새 마우스 리스너 추가
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                int col = table.columnAtPoint(e.getPoint());
+
+                if (col < 0) return; // 잘못된 영역 클릭 방지
+
+                // 좌클릭 → 레시피 조회
+                if (SwingUtilities.isLeftMouseButton(e)) {
+                    String recipe = (String) table.getValueAt(row, col);
+                    if (recipe != null && !recipe.isEmpty()) {
+                        JOptionPane.showMessageDialog(
+                        		//임시로 디스플레이로 레시피 출력해봄
+                                PlannerDisplay.this,
+                                "레시피 상세보기:\n\n" + recipe,
+                                "레시피 조회",
+                                JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        JOptionPane.showMessageDialog(
+                                PlannerDisplay.this,
+                                "등록된 레시피가 없습니다.",
+                                "알림",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                    }
+                }
+
+                // 우클릭 → 삭제 메뉴
+                if (SwingUtilities.isRightMouseButton(e)) {
+                    JPopupMenu popup = new JPopupMenu();
+                    JMenuItem deleteItem = new JMenuItem("삭제하기");
+
+                    deleteItem.addActionListener(ae -> {
+                        table.setValueAt("", row, col);
+                    });
+
+                    popup.add(deleteItem);
+                    popup.show(table, e.getX(), e.getY());
+                }
+            }
+        });		
+	}
+
+	private String getWeekText() {
     	return currentYear + "년 " + currentMonth + "월 " + currentWeek + "주차";
     }
 
