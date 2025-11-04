@@ -111,7 +111,7 @@ public class PlannerDisplay extends JFrame {
     }
     
     private void updateTableHeaders() {
-    	// 현재 주의 시작 날짜 계산 (월요일 기준)
+    	// 현재 주의 시작 날짜 계산 (월요일 기준) 이었는데 일요일 기준으로 변경어디서 된지 모르겠음ㅋㅋ;;
         LocalDate startOfWeek = LocalDate.of(currentYear, currentMonth, 1)
             .with(WeekFields.of(Locale.getDefault()).weekOfMonth(), currentWeek)
             .with(WeekFields.of(Locale.getDefault()).dayOfWeek(), 1);
