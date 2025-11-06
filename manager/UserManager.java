@@ -10,30 +10,27 @@ public class UserManager {
     private ArrayList<User> userList = new ArrayList<>();
     private static final String FILENAME = "users.txt";
 
-    /**
-     * 생성자: 프로그램 시작 시 파일에서 유저 정보를 불러옵니다.
-     */
     public UserManager() {
         loadUsersFromFile();
     }
 
     /**
      * [로그인 로직]
-     * ID와 PW를 받아 리스트와 비교합니다.
+     * ID와 PW를 받아 리스트와 비교.
      * @return 로그인 성공 시 User 객체, 실패 시 null
      */
     public User login(String id, String password) {
         for (User user : userList) {
             if (user.getId().equals(id) && user.getPw().equals(password)) {
-                return user; // 로그인 성공
+                return user;
             }
         }
-        return null; // 로그인 실패
+        return null;
     }
 
     /**
      * [회원가입 로직]
-     * ID, PW, 이름을 받아 중복 검사 후 파일에 저장합니다.
+     * ID, PW, 이름을 받아 중복 검사 후 파일에 저장.
      * @return 0: 성공, 1: ID 중복, 2: 파일 쓰기 오류
      */
     public int signUp(String id, String password, String name) {
@@ -47,17 +44,13 @@ public class UserManager {
             out.println(newUser.toString());
         } catch (IOException e) {
             e.printStackTrace();
-            return 2; // 파일 쓰기 오류
+            return 2;
         }
-
-        // 4. 메모리(리스트)에도 추가
         userList.add(newUser);
-        return 0; // 성공
+        return 0;
     }
 
-    /**
-     * ID로 유저를 검색합니다. (matches 활용)
-     */
+
     private User findById(String id) {
         for (User user : userList) {
             if (user.matches(id)) {
@@ -67,9 +60,7 @@ public class UserManager {
         return null;
     }
 
-    /**
-     * users.txt 파일에서 유저 목록을 불러와 userList에 채웁니다.
-     */
+
     private void loadUsersFromFile() {
         File file = new File(FILENAME);
         if (!file.exists()) {
@@ -81,7 +72,7 @@ public class UserManager {
             while (sc.hasNextLine()) {
                 User u = new User();
                 u.read(sc);
-                if (u.getId() != null) { // 비어있는 줄 방지
+                if (u.getId() != null) {
                     userList.add(u);
                 }
             }
