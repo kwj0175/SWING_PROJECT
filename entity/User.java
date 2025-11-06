@@ -1,8 +1,10 @@
 package entity;
 
+import manager.Manageable;
+
 import java.util.Scanner;
 
-public class User {
+public class User implements Manageable {
     private String id;
     private String pw;
     private String name;
