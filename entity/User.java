@@ -50,4 +50,5 @@ public class User implements Manageable {
     public String getName() {
         return name;
     }
+    // pr 테스트
 }
