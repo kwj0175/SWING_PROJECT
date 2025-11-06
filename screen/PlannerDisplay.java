@@ -123,7 +123,7 @@ public class PlannerDisplay extends JFrame {
 
                 if (col < 0) return; // 잘못된 영역 클릭 방지
 
-                // 좌클릭 → 레시피 조회
+                // 좌클릭 → 레시피 조회 기능
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     String recipe = (String) table.getValueAt(row, col);
                     if (recipe != null && !recipe.isEmpty()) {
@@ -144,7 +144,7 @@ public class PlannerDisplay extends JFrame {
                     }
                 }
 
-                // 우클릭 → 삭제 메뉴
+                // 우클릭 → 삭제 메뉴 기능
                 if (SwingUtilities.isRightMouseButton(e)) {
                     JPopupMenu popup = new JPopupMenu();
                     JMenuItem deleteItem = new JMenuItem("삭제하기");
@@ -188,7 +188,7 @@ public class PlannerDisplay extends JFrame {
         model.setColumnIdentifiers(columns);
 	}
     
- // 요일을 한글로 변환하는 메서드
+    // 요일을 한글로 변환하는 메서드
     private String getDayOfWeekKorean(int dayOfWeek) {
         switch (dayOfWeek) {
             case 1: return "월";
