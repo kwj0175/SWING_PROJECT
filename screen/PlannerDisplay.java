@@ -11,6 +11,9 @@ import java.awt.event.*;
 public class PlannerDisplay extends JFrame {
     private JTable table;
     private JLabel weekLabel;
+    private JPanel recipePanel;
+    private JLabel recipeTitleLabel;
+    private JTextArea recipeContentArea;
     private int currentWeek;
     private int currentMonth;
     private int currentYear;
@@ -58,6 +61,32 @@ public class PlannerDisplay extends JFrame {
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); // 가로 스크롤 활성화
 
+        // 하단 레시피 표시 패널
+        recipePanel = new JPanel();
+        recipePanel.setLayout(new BorderLayout());
+        recipePanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createTitledBorder("레시피 상세정보"),
+            BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
+        recipePanel.setPreferredSize(new Dimension(360, 180));
+        
+        // 레시피 제목 라벨
+        recipeTitleLabel = new JLabel("레시피를 선택하세요");
+        recipeTitleLabel.setFont(new Font("맑은 고딕", Font.BOLD, 14));
+        recipeTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        
+        // 레시피 내용 영역
+        recipeContentArea = new JTextArea();
+        recipeContentArea.setEditable(false);
+        recipeContentArea.setLineWrap(true);
+        recipeContentArea.setWrapStyleWord(true);
+        recipeContentArea.setFont(new Font("맑은 고딕", Font.PLAIN, 12));
+        recipeContentArea.setText("표의 셀을 클릭하면 레시피 정보가 여기에 표시됩니다.");
+        JScrollPane recipeScrollPane = new JScrollPane(recipeContentArea);
+        
+        recipePanel.add(recipeTitleLabel, BorderLayout.NORTH);
+        recipePanel.add(recipeScrollPane, BorderLayout.CENTER);
+
         // 이전주 버튼 클릭 이벤트
         prevWeekBtn.addActionListener(event -> {
         	currentWeek--;
@@ -98,6 +127,7 @@ public class PlannerDisplay extends JFrame {
         setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
+        add(recipePanel, BorderLayout.SOUTH);
         
         updateTableHeaders(); //초기 실행시 테이블 헤더 정상적으로 나타내도록 표시
         
@@ -125,22 +155,18 @@ public class PlannerDisplay extends JFrame {
 
                 // 좌클릭 → 레시피 조회
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    String recipe = (String) table.getValueAt(row, col);
+                    String recipe = (String) table.getValueAt(row, col); // 셀에서 레시피 정보 가져오기, 나중에 셀에 넣을때 레시피 정보 같이 넣어야함
                     if (recipe != null && !recipe.isEmpty()) {
-                        JOptionPane.showMessageDialog(
-                        		//임시로 디스플레이로 레시피 출력해봄
-                                PlannerDisplay.this,
-                                "레시피 상세보기:\n\n" + recipe,
-                                "레시피 조회",
-                                JOptionPane.INFORMATION_MESSAGE
-                        );
+                        // 레시피 제목 업데이트
+                        String mealType = (String) table.getValueAt(row, 0);
+                        String dayHeader = table.getColumnName(col);
+                        recipeTitleLabel.setText(dayHeader + " - " + mealType);
+                        
+                        // 레시피 내용 업데이트
+                        recipeContentArea.setText(recipe);
                     } else {
-                        JOptionPane.showMessageDialog(
-                                PlannerDisplay.this,
-                                "등록된 레시피가 없습니다.",
-                                "알림",
-                                JOptionPane.WARNING_MESSAGE
-                        );
+                        recipeTitleLabel.setText("등록된 레시피 없음");
+                        recipeContentArea.setText("해당 시간대에 등록된 레시피가 없습니다.");
                     }
                 }
 
@@ -151,6 +177,8 @@ public class PlannerDisplay extends JFrame {
 
                     deleteItem.addActionListener(ae -> {
                         table.setValueAt("", row, col);
+                        recipeTitleLabel.setText("레시피를 선택하세요");
+                        recipeContentArea.setText("표의 셀을 클릭하면 레시피 정보가 여기에 표시됩니다.");
                     });
 
                     popup.add(deleteItem);
