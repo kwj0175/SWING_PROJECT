@@ -1,17 +1,18 @@
-package screen;
+package screen.planner;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.time.temporal.WeekFields;
 import java.util.Locale;
 import java.awt.event.*;
 
-public class PlannerDisplay extends JFrame {
+public class PlannerDisplay extends JPanel {
     private JTable table;
     private JLabel weekLabel;
-    private JPanel recipePanel;
     private JLabel recipeTitleLabel;
     private JTextArea recipeContentArea;
     private int currentWeek;
@@ -19,56 +20,33 @@ public class PlannerDisplay extends JFrame {
     private int currentYear;
 
     public PlannerDisplay() {
-        setTitle("식단 플래너");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //일단 창닫으면 종료
-        setSize(360, 640); // 화면 크기
-        setLocationRelativeTo(null);
-
-        // 날짜 관련 설정
-        LocalDate today = LocalDate.now();
-        currentYear = today.getYear(); // 시작 연도 설정
-        currentMonth = today.getMonthValue(); // 시작 월 설정
-        currentWeek = today.get(WeekFields.of(Locale.getDefault()).weekOfMonth()); // 시작 주차 설정
-
-        // 상단 패널 (이전주 / 현재주 / 다음주)
+        setDate();
         JPanel topPanel = new JPanel();
-        JButton homeBtn = new JButton("홈");// 좌상단 홈버튼
-        JButton prevWeekBtn = new JButton("←");
-        JButton nextWeekBtn = new JButton("→");
-        weekLabel = new JLabel(getWeekText(), SwingConstants.CENTER);
-        weekLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
 
-        //topPanel에 맞춰 버튼추가
-        topPanel.add(homeBtn);
-        topPanel.add(prevWeekBtn);
-        topPanel.add(weekLabel);
-        topPanel.add(nextWeekBtn);
+        JScrollPane scrollPane = buildTable(topPanel);
+        JPanel recipePanel = buildRecipe();
 
-        // 표 구성
-        String[] columns = {"일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"};//임시값, updateTableHeaders() 메서드에서 업데이트됨
-        String[] rows = {"아침", "점심", "저녁", "총칼로리"};
+        setLayout(new BorderLayout());
+        this.add(topPanel, BorderLayout.NORTH);
+        this.add(scrollPane, BorderLayout.CENTER);
+        this.add(recipePanel, BorderLayout.SOUTH);
 
+        updateTableHeaders(); //초기 실행시 테이블 헤더 정상적으로 나타내도록 표시
+    }
 
-        DefaultTableModel model = new DefaultTableModel(rows.length, columns.length);
-        model.setColumnIdentifiers(columns);
-        table = new JTable(model);
-        setupTableInteraction();
-        table.setRowHeight(40);
-        for (int i = 0; i < rows.length; i++) {
-            model.setValueAt(rows[i], i, 0);
-        }
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); // 가로 스크롤 활성화
-
+    private JPanel buildRecipe() {
         // 하단 레시피 표시 패널
-        recipePanel = new JPanel();
+        JPanel recipePanel = new JPanel();
         recipePanel.setLayout(new BorderLayout());
-        recipePanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder("레시피 상세정보"),
-            BorderFactory.createEmptyBorder(5, 5, 5, 5)
-        ));
         recipePanel.setPreferredSize(new Dimension(360, 180));
+
+        recipePanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(
+                        BorderFactory.createLineBorder(new Color(0x273142)),
+                        "레시피 상세정보",
+                        0, 0, new Font("맑은 고딕", Font.BOLD, 12)),
+                BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        ));
 
         // 레시피 제목 라벨
         recipeTitleLabel = new JLabel("레시피를 선택하세요");
@@ -86,10 +64,67 @@ public class PlannerDisplay extends JFrame {
 
         recipePanel.add(recipeTitleLabel, BorderLayout.NORTH);
         recipePanel.add(recipeScrollPane, BorderLayout.CENTER);
+        return recipePanel;
+    }
 
+    private JScrollPane buildTable(JPanel topPanel) {
+        weekLabel = new JLabel(getWeekText(), SwingConstants.CENTER);
+        weekLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+        buildButtons(topPanel);
+
+        // 표 구성
+        String[] columns = {"일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"};//임시값, updateTableHeaders() 메서드에서 업데이트됨
+        String[] rows = {"아침", "점심", "저녁"};
+
+        DefaultTableModel model = new DefaultTableModel(rows.length, columns.length);
+        model.setColumnIdentifiers(columns);
+        table = new JTable(model);
+        setupTableInteraction();
+        table.setRowHeight(40);
+        for (int i = 0; i < rows.length; i++) {
+            model.setValueAt(rows[i], i, 0);
+        }
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); // 가로 스크롤 활성화
+        return scrollPane;
+    }
+
+    private void buttonListener(JButton homeBtn, JButton prevWeekBtn, JButton nextWeekBtn) {
+        prevWeekBtnAction(prevWeekBtn);
+        nextWeekBtnAction(nextWeekBtn);
+
+        homeBtn.addActionListener(event -> {
+            System.out.println("홈 버튼 클릭됨");
+            // 홈 버튼 클릭 시 동작 추가 가능
+        });
+    }
+
+    private void buildButtons(JPanel topPanel) {
+        JButton homeBtn = new JButton("❮❮");// 좌상단 홈버튼
+        JButton prevWeekBtn = new JButton("❮");
+        JButton nextWeekBtn = new JButton("❯");
+
+        topPanel.add(setCustomButton(homeBtn));
+        topPanel.add(setCustomButton(prevWeekBtn));
+        topPanel.add(weekLabel);
+        topPanel.add(setCustomButton(nextWeekBtn));
+
+        buttonListener(homeBtn, prevWeekBtn, nextWeekBtn);
+    }
+
+    private void setDate() {
+        // 날짜 관련 설정
+        LocalDate today = LocalDate.now();
+        currentYear = today.getYear(); // 시작 연도 설정
+        currentMonth = today.getMonthValue(); // 시작 월 설정
+        currentWeek = today.get(WeekFields.of(Locale.getDefault()).weekOfMonth()); // 시작 주차 설정
+    }
+
+    private void prevWeekBtnAction(JButton button) {
         // 이전주 버튼 클릭 이벤트
-        prevWeekBtn.addActionListener(event -> {
-        	currentWeek--;
+        button.addActionListener(event -> {
+            currentWeek--;
             if (currentWeek < 1) {
                 currentMonth--; // 월 감소
                 if (currentMonth < 1) {
@@ -101,10 +136,12 @@ public class PlannerDisplay extends JFrame {
             updateWeekLabel(); // 주차 라벨 업데이트
             updateTableHeaders(); // 테이블 헤더 업데이트
         });
+    }
 
+    private void nextWeekBtnAction(JButton button) {
         // 다음주 버튼 클릭 이벤트
-        nextWeekBtn.addActionListener(event -> {
-        	currentWeek++;
+        button.addActionListener(event -> {
+            currentWeek++;
             if (currentWeek > 4) {
                 currentMonth++; // 월 증가
                 if (currentMonth > 12) {
@@ -116,22 +153,16 @@ public class PlannerDisplay extends JFrame {
             updateWeekLabel(); // 주차 라벨 업데이트
             updateTableHeaders(); // 테이블 헤더 업데이트
         });
+    }
 
-        // 홈 버튼 클릭 이벤트 추가
-        homeBtn.addActionListener(event -> {
-            System.out.println("홈 버튼 클릭됨");
-            // 홈 버튼 클릭 시 동작 추가 가능
-        });
-
-        // 배치
-        setLayout(new BorderLayout());
-        add(topPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-        add(recipePanel, BorderLayout.SOUTH);
-
-        updateTableHeaders(); //초기 실행시 테이블 헤더 정상적으로 나타내도록 표시
-
-        setVisible(true);
+    private JButton setCustomButton(JButton button) {
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setOpaque(false);
+        button.setBackground(new Color(0, 0, 0, 0));
+        button.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        return button;
     }
 
     private void setupTableInteraction() {
@@ -217,19 +248,8 @@ public class PlannerDisplay extends JFrame {
 	}
 
     private String getDayOfWeekKorean(int dayOfWeek) {
-        switch (dayOfWeek) {
-            case 1: return "월";
-            case 2: return "화";
-            case 3: return "수";
-            case 4: return "목";
-            case 5: return "금";
-            case 6: return "토";
-            case 7: return "일";
-            default: return "";
-        }
+        DayOfWeek day = DayOfWeek.of(dayOfWeek);
+        return day.getDisplayName(TextStyle.SHORT, Locale.KOREAN);
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(PlannerDisplay::new);
-    }
 }
