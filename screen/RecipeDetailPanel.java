@@ -31,7 +31,7 @@ public class RecipeDetailPanel extends JPanel {
 
         // ===== 이미지 =====
         imgLabel = new JLabel("이미지 없음", SwingConstants.CENTER);
-        // 360x640 기준: 좌우 여백 감안해서 320x200 정도
+        // 360x640 기준: 
         imgLabel.setPreferredSize(new Dimension(320, 200));
 
         // ===== 재료 =====
