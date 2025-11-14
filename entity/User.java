@@ -17,7 +17,6 @@ public class User implements Manageable {
         this.name = name;
     }
 
-
     public void read(Scanner sc) {
         String line = sc.nextLine();
         String[] parts = line.split(" \\| ");
@@ -50,5 +49,4 @@ public class User implements Manageable {
     public String getName() {
         return name;
     }
-    // pr 테스트
 }

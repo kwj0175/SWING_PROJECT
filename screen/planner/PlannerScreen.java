@@ -10,7 +10,7 @@ import java.time.temporal.WeekFields;
 import java.util.Locale;
 import java.awt.event.*;
 
-public class PlannerDisplay extends JPanel {
+public class PlannerScreen extends JPanel {
     private JTable table;
     private JLabel weekLabel;
     private JLabel recipeTitleLabel;
@@ -19,7 +19,7 @@ public class PlannerDisplay extends JPanel {
     private int currentMonth;
     private int currentYear;
 
-    public PlannerDisplay() {
+    public PlannerScreen() {
         setDate();
         JPanel topPanel = new JPanel();
 
