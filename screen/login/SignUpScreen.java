@@ -1,0 +1,161 @@
+package screen.login;
+
+import manager.UserManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class SignUpScreen extends JDialog {
+    private final UserManager userManager;
+
+    private JTextField idField;
+    private JPasswordField pwField;
+    private JTextField nameField;
+    private JButton signUpButton;
+    private JButton backButton;
+
+    public SignUpScreen(JFrame parentFrame, UserManager manager) {
+        super(parentFrame, "회원가입", true);
+        this.userManager = manager;
+
+        JPanel form = buildForm();
+        setContentPane(form);
+        pack();
+        setLocationRelativeTo(parentFrame);
+
+        // "뒤로가기" 버튼 리스너
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+            }
+        });
+
+        // [회원가입하기] 버튼 리스너
+        signUpButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handleSignUp();
+            }
+        });
+    }
+
+    private void handleSignUp() {
+        String id = idField.getText();
+        String pw = new String(pwField.getPassword());
+        String name = nameField.getText();
+
+        if (id.isEmpty() || pw.isEmpty() || name.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "모든 항목을 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int result = userManager.signUp(id, pw, name);
+
+        switch (result) {
+            case 0:
+                JOptionPane.showMessageDialog(this, "회원가입 성공! 로그인 해주세요.", "성공", JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+                break;
+            case 1:
+                JOptionPane.showMessageDialog(this, "이미 사용 중인 ID입니다.", "ID 중복 오류", JOptionPane.ERROR_MESSAGE);
+                break;
+            case 2:
+            default:
+                JOptionPane.showMessageDialog(this, "시스템 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
+                break;
+        }
+    }
+
+    private JPanel buildForm() {
+        JLabel titleLabel = setLabelWithFont(new JLabel("회원가입"), "SansSerif", Font.BOLD, 24);
+
+        JLabel idLabel = new JLabel("ID");
+        idField = new JTextField(20);
+        JLabel pwLabel = new JLabel("PW");
+        pwField = new JPasswordField(20);
+        JLabel nameLabel = new JLabel("이름");
+        nameField = new JTextField(20);
+
+        backButton = new JButton("뒤로가기");
+        signUpButton = new JButton("회원가입");
+
+        int TEXT_FIELD_WIDTH = 180;
+        int CONTAINER_GAP = 30;
+        int ROW_GAP = 20;
+
+        JPanel form = new JPanel();
+        GroupLayout formLayout = new GroupLayout(form);
+        form.setLayout(formLayout);
+
+        formLayout.setAutoCreateGaps(false);
+        formLayout.setAutoCreateContainerGaps(true);
+
+        formLayout.setHorizontalGroup(
+                formLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(titleLabel)
+                        .addGroup(formLayout.createSequentialGroup()
+                                .addComponent(idLabel)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(idField,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        TEXT_FIELD_WIDTH,
+                                        GroupLayout.PREFERRED_SIZE)
+                        )
+                        .addGroup(formLayout.createSequentialGroup()
+                                .addComponent(pwLabel)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(pwField,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        TEXT_FIELD_WIDTH,
+                                        GroupLayout.PREFERRED_SIZE)
+                        )
+                        .addGroup(formLayout.createSequentialGroup()
+                                .addComponent(nameLabel)
+                                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(nameField,
+                                        GroupLayout.PREFERRED_SIZE,
+                                        TEXT_FIELD_WIDTH,
+                                        GroupLayout.PREFERRED_SIZE))
+                        .addGroup(formLayout.createSequentialGroup()
+                                .addComponent(backButton)
+                                .addGap(CONTAINER_GAP)
+                                .addComponent(signUpButton)
+                        )
+        );
+
+        formLayout.setVerticalGroup(
+                formLayout.createSequentialGroup()
+                        .addComponent(titleLabel)
+                        .addGap(CONTAINER_GAP)
+                        .addGroup(formLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(idLabel)
+                                .addComponent(idField))
+                        .addGap(ROW_GAP)
+                        .addGroup(formLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(pwLabel)
+                                .addComponent(pwField))
+                        .addGap(ROW_GAP)
+                        .addGroup(formLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(nameLabel)
+                                .addComponent(nameField))
+                        .addGap(CONTAINER_GAP)
+                        .addGroup(formLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(backButton)
+                                .addComponent(signUpButton))
+                        .addGap(CONTAINER_GAP)
+        );
+
+        formLayout.linkSize(SwingConstants.HORIZONTAL, idLabel, pwLabel, nameLabel);
+        formLayout.linkSize(SwingConstants.HORIZONTAL, backButton, signUpButton);
+
+        return form;
+    }
+
+    private JLabel setLabelWithFont(JLabel label, String font, int style, int size) {
+        label.setFont(new Font(font, style, size));
+        return label;
+    }
+}

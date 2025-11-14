@@ -44,6 +44,7 @@ public class UserManager {
         try (PrintWriter out = new PrintWriter(new FileWriter(FILENAME, true))) {
             out.println(newUser.toString());
         } catch (IOException e) {
+            System.err.println("[ERROR] 사용자 정보 저장 실패: " + e.getMessage());
             e.printStackTrace();
             return 2;
         }
