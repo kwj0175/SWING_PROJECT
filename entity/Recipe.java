@@ -2,32 +2,50 @@ package entity;
 
 public class Recipe {
 
-    // ===== 필드(속성) =====
-    private String name;        // 메뉴 이름
-    private String ingredients; // 재료 (문자열 하나, 나중에 줄바꿈 포함 가능)
-    private String method;      // 조리방법 (문자열 하나, 나중에 줄바꿈 포함 가능)
-    private int servings;       // 인분 수
-    private int cookTime;       // 조리시간(분)
-    private String imagePath;   // 이미지 파일 경로
+    private int id;                // 레시피 번호
+    private String name;           // 레시피 이름
+    private String category;       // 카테고리 (밥, 국, 찌개, 반찬 등)
+    private String ingredients;    // 재료 설명 (여러 줄 문자열)
+    private String steps;          // 조리 방법 (여러 줄 문자열)
+    private String imagePath;      // 이미지 파일 경로
 
-    // ===== 생성자 =====
-    public Recipe(String name, String ingredients, String method,
-                  int servings, int cookTime, String imagePath) {
+    public Recipe() {
+    }
+
+    public Recipe(int id, String name, String category,
+                  String ingredients, String steps, String imagePath) {
+        this.id = id;
         this.name = name;
+        this.category = category;
         this.ingredients = ingredients;
-        this.method = method;
-        this.servings = servings;
-        this.cookTime = cookTime;
+        this.steps = steps;
         this.imagePath = imagePath;
     }
 
-    // ===== getter / setter =====
+    // ===== Getter / Setter =====
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getIngredients() {
@@ -38,28 +56,12 @@ public class Recipe {
         this.ingredients = ingredients;
     }
 
-    public String getMethod() {
-        return method;
+    public String getSteps() {
+        return steps;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public int getServings() {
-        return servings;
-    }
-
-    public void setServings(int servings) {
-        this.servings = servings;
-    }
-
-    public int getCookTime() {
-        return cookTime;
-    }
-
-    public void setCookTime(int cookTime) {
-        this.cookTime = cookTime;
+    public void setSteps(String steps) {
+        this.steps = steps;
     }
 
     public String getImagePath() {
@@ -72,7 +74,10 @@ public class Recipe {
 
     @Override
     public String toString() {
-        // 나중에 리스트 등에 띄울 때 이름만 보이게
-        return name;
+        return "Recipe{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", category='" + category + '\'' +
+                '}';
     }
 }
