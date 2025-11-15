@@ -1,0 +1,12 @@
+2025-11-03T13:06:37.290Z [INFO] ----------------------invoke list_jdks----------------------
+2025-11-03T13:06:37.292Z [INFO] [Tool.invoke]({name: list_jdks, input: {
+  "projectPath": "c:\\Users\\User\\Desktop\\SWING_PROJECT"
+}}).
+2025-11-03T13:06:37.294Z [INFO] [Task.start](): Starting task toolCall
+2025-11-03T13:06:37.296Z [INFO] [Task.start](): Started task toolCall
+2025-11-03T13:06:37.298Z [INFO] [Tool.invoke] validate GitHub Copilot license.
+2025-11-03T13:06:37.300Z [WARN] "GitHub Copilot app modernization - upgrade for Java" and its tools are only available for GitHub Copilot "Pro", "Pro+", "Business" and "Enterprise" plans.
+2025-11-03T13:06:37.304Z [ERROR] [Tool.invoke] error occurs when invoking tool list_jdks: UnsupportedCopilotPlanError: "GitHub Copilot app modernization - upgrade for Java" and its tools are only available for GitHub Copilot "Pro", "Pro+", "Business" and "Enterprise" plans.. Please upgrade your GitHub Copilot plan to use this feature or upgrading this project using other tools you prefer..
+2025-11-03T13:06:37.306Z [INFO] [Task.complete](): Completing task toolCall
+2025-11-03T13:06:37.308Z [INFO] ----------------------invoked list_jdks----------------------
+2025-11-03T13:06:37.311Z [INFO] [Task.complete](): Completed task toolCall
