@@ -1,5 +1,7 @@
 package screen.planner;
 
+import screen.MainScreen;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -15,23 +17,113 @@ public class PlannerScreen extends JPanel {
     private JLabel weekLabel;
     private JLabel recipeTitleLabel;
     private JTextArea recipeContentArea;
+    private JButton homeBtn;
+    private JButton prevWeekBtn;
+    private JButton nextWeekBtn;
     private int currentWeek;
     private int currentMonth;
     private int currentYear;
 
-    public PlannerScreen() {
+    public PlannerScreen(MainScreen mainScreen) {
         setDate();
-        JPanel topPanel = new JPanel();
+        setLayout(new GridBagLayout());
 
+        JPanel form = buildForm();
+        JPanel backBtnPanel = buildBackBtnPanel();
+
+        JPanel root = new JPanel();
+        GroupLayout layout = new GroupLayout(root);
+        root.setLayout(layout);
+        root.setOpaque(false);
+
+        layout.setAutoCreateGaps(false);
+        layout.setAutoCreateContainerGaps(false);
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(backBtnPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(form, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(backBtnPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(form, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = c.gridy = 0;
+        c.weightx = 1.0;
+        c.weighty = 1.0;
+        c.fill = GridBagConstraints.BOTH;
+        add(root, c);
+
+        prevWeekBtnAction(prevWeekBtn);
+        nextWeekBtnAction(nextWeekBtn);
+
+        homeBtn.addActionListener(event -> {
+            System.out.println("홈 버튼 클릭됨");
+            mainScreen.displayHomeScreen();
+        });
+    }
+
+    private JPanel buildBackBtnPanel() {
+        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        homeBtn = new JButton("❮❮");
+        bar.add(setCustomButton(homeBtn));
+        return bar;
+    }
+
+    private JPanel buildForm() {
+        JPanel topPanel = new JPanel();
         JScrollPane scrollPane = buildTable(topPanel);
         JPanel recipePanel = buildRecipe();
 
-        setLayout(new BorderLayout());
-        this.add(topPanel, BorderLayout.NORTH);
-        this.add(scrollPane, BorderLayout.CENTER);
-        this.add(recipePanel, BorderLayout.SOUTH);
+        JPanel form = new JPanel();
+        GroupLayout formLayout = new GroupLayout(form);
+        form.setLayout(formLayout);
+
+        formLayout.setAutoCreateGaps(false);
+        formLayout.setAutoCreateContainerGaps(false);
+
+        int GAP = 5;
+        formLayout.setHorizontalGroup(
+                formLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(topPanel,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)
+                        .addComponent(scrollPane,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)
+                        .addComponent(recipePanel,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)
+        );
+
+        // 세로: 위(top) - 가운데(scroll) - 아래(recipe) 순서로 배치
+        formLayout.setVerticalGroup(
+                formLayout.createSequentialGroup()
+                        .addComponent(topPanel,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+                        .addGap(GAP)
+                        .addComponent(scrollPane,
+                                0,
+                                GroupLayout.DEFAULT_SIZE,
+                                Short.MAX_VALUE)   // ★ 가운데가 가변 높이
+                        .addGap(GAP)
+                        .addComponent(recipePanel,
+                                GroupLayout.PREFERRED_SIZE,
+                                GroupLayout.DEFAULT_SIZE,
+                                GroupLayout.PREFERRED_SIZE)
+        );
 
         updateTableHeaders(); //초기 실행시 테이블 헤더 정상적으로 나타내도록 표시
+        return form;
     }
 
     private JPanel buildRecipe() {
@@ -90,27 +182,11 @@ public class PlannerScreen extends JPanel {
         return scrollPane;
     }
 
-    private void buttonListener(JButton homeBtn, JButton prevWeekBtn, JButton nextWeekBtn) {
-        prevWeekBtnAction(prevWeekBtn);
-        nextWeekBtnAction(nextWeekBtn);
-
-        homeBtn.addActionListener(event -> {
-            System.out.println("홈 버튼 클릭됨");
-            // 홈 버튼 클릭 시 동작 추가 가능
-        });
-    }
-
     private void buildButtons(JPanel topPanel) {
     	topPanel.setLayout(new BorderLayout());
-    	
-        JButton homeBtn = new JButton("❮❮");// 좌상단 홈버튼
-        JButton prevWeekBtn = new JButton("❮");
-        JButton nextWeekBtn = new JButton("❯");
-        
-    	// 왼쪽(서쪽)에 홈버튼
-        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        leftPanel.setOpaque(false);
-        leftPanel.add(setCustomButton(homeBtn));
+
+        prevWeekBtn = new JButton("❮");
+        nextWeekBtn = new JButton("❯");
         
         // 가운데(중앙)에 주차 라벨
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -118,12 +194,8 @@ public class PlannerScreen extends JPanel {
         centerPanel.add(setCustomButton(prevWeekBtn));
         centerPanel.add(weekLabel);
         centerPanel.add(setCustomButton(nextWeekBtn));
-        
-        // 전체 topPanel에 부착
-        topPanel.add(leftPanel, BorderLayout.WEST);
-        topPanel.add(centerPanel, BorderLayout.CENTER);
 
-        buttonListener(homeBtn, prevWeekBtn, nextWeekBtn);
+        topPanel.add(centerPanel, BorderLayout.CENTER);
     }
 
     private void setDate() {
