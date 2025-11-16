@@ -1,6 +1,7 @@
 package screen;
 
 import entity.User;
+import screen.category.CategoryScreen;
 import screen.home.HomeScreen;
 import screen.login.LoginScreen;
 import screen.planner.PlannerScreen;
@@ -18,6 +19,7 @@ public class MainScreen extends JFrame {
     private final HomeScreen homeScreen;
     private final PlannerScreen plannerScreen;
     private final LoginScreen loginScreen;
+    private final CategoryScreen categoryScreen;
 
     public MainScreen() {
         setTitle("MySmartRecipe");
@@ -34,15 +36,19 @@ public class MainScreen extends JFrame {
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = c.gridy = 0;
-        add(cardPanel, c);
+//        c.weightx = c.weighty = 1.0;
+//        c.fill = GridBagConstraints.BOTH;
+        stage.add(cardPanel, c);
 
         loginScreen = new LoginScreen(this);
         homeScreen = new HomeScreen(this);
         plannerScreen = new PlannerScreen();
+        categoryScreen = new CategoryScreen();
 
         cardPanel.add(loginScreen, "Login");
         cardPanel.add(homeScreen, "Home");
         cardPanel.add(plannerScreen, "Planner");
+        cardPanel.add(categoryScreen, "Category");
 
         cardLayout.show(cardPanel, "Login");
         setVisible(true);
@@ -59,6 +65,10 @@ public class MainScreen extends JFrame {
 
     public void displayPlannerScreen() {
         cardLayout.show(cardPanel, "Planner");
+    }
+
+    public void displayCategoryScreen() {
+        cardLayout.show(cardPanel, "Category");
     }
 
 //    private void setBackgroundIMG(JLayeredPane layeredPane) {
