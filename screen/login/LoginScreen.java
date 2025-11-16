@@ -53,6 +53,17 @@ public class LoginScreen extends JPanel {
                 signUpScreen.setVisible(true);
             }
         });
+
+        // [Enter 키 리스너]
+        ActionListener enterListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginButton.doClick();
+            }
+        };
+        idField.addActionListener(enterListener);
+        pwField.addActionListener(enterListener);
+
     }
 
     private JPanel buildForm() {
