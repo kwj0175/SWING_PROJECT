@@ -101,14 +101,27 @@ public class PlannerScreen extends JPanel {
     }
 
     private void buildButtons(JPanel topPanel) {
+    	topPanel.setLayout(new BorderLayout());
+    	
         JButton homeBtn = new JButton("❮❮");// 좌상단 홈버튼
         JButton prevWeekBtn = new JButton("❮");
         JButton nextWeekBtn = new JButton("❯");
-
-        topPanel.add(setCustomButton(homeBtn));
-        topPanel.add(setCustomButton(prevWeekBtn));
-        topPanel.add(weekLabel);
-        topPanel.add(setCustomButton(nextWeekBtn));
+        
+    	// 왼쪽(서쪽)에 홈버튼
+        JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        leftPanel.setOpaque(false);
+        leftPanel.add(setCustomButton(homeBtn));
+        
+        // 가운데(중앙)에 주차 라벨
+        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
+        centerPanel.setOpaque(false);
+        centerPanel.add(setCustomButton(prevWeekBtn));
+        centerPanel.add(weekLabel);
+        centerPanel.add(setCustomButton(nextWeekBtn));
+        
+        // 전체 topPanel에 부착
+        topPanel.add(leftPanel, BorderLayout.WEST);
+        topPanel.add(centerPanel, BorderLayout.CENTER);
 
         buttonListener(homeBtn, prevWeekBtn, nextWeekBtn);
     }
@@ -131,7 +144,7 @@ public class PlannerScreen extends JPanel {
                     currentYear--; // 연도 감소
                     currentMonth = 12; // 월을 12로 설정
                 }
-                currentWeek = 4; // 주차를 4로 설정
+                currentWeek = 5; // 한달 최대 5주차까지
             }
             updateWeekLabel(); // 주차 라벨 업데이트
             updateTableHeaders(); // 테이블 헤더 업데이트
@@ -142,7 +155,7 @@ public class PlannerScreen extends JPanel {
         // 다음주 버튼 클릭 이벤트
         button.addActionListener(event -> {
             currentWeek++;
-            if (currentWeek > 4) {
+            if (currentWeek > 5) {
                 currentMonth++; // 월 증가
                 if (currentMonth > 12) {
                     currentYear++; // 연도 증가
@@ -182,7 +195,7 @@ public class PlannerScreen extends JPanel {
                 int row = table.rowAtPoint(e.getPoint());
                 int col = table.columnAtPoint(e.getPoint());
 
-                if (col < 0) return; // 잘못된 영역 클릭 방지
+                if (col <= 0) return; // 잘못된 영역 클릭 방지
 
                 // 좌클릭 → 레시피 조회
                 if (SwingUtilities.isLeftMouseButton(e)) {
@@ -228,7 +241,7 @@ public class PlannerScreen extends JPanel {
     }
 
     private void updateTableHeaders() {
-    	// 현재 주의 시작 날짜 계산 (월요일 기준) 이었는데 일요일 기준으로 변경어디서 된지 모르겠음ㅋㅋ;;
+    	// 현재 주의 시작 날짜 계산 (일요일 기준)
         LocalDate startOfWeek = LocalDate.of(currentYear, currentMonth, 1)
             .with(WeekFields.of(Locale.getDefault()).weekOfMonth(), currentWeek)
             .with(WeekFields.of(Locale.getDefault()).dayOfWeek(), 1);
