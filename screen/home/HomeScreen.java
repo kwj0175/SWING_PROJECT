@@ -20,7 +20,12 @@ public class HomeScreen extends JPanel {
 
     public HomeScreen(MainScreen mainScreen) {
         currentUser = null;
-        buildForm();
+        setOpaque(false);
+        setLayout(new GridBagLayout());
+        JPanel form = buildForm();
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = c.gridy = 0;
+        add(form, c);
         // this.recipeManager = new RecipeManager(); // (RecipeManager 구현 후 주석 해제)
         // (RecipeManager 구현 후)
         // recommendedRecipes = recipeManager.getRandomRecipes(3); // 3개 랜덤 추출
@@ -40,8 +45,7 @@ public class HomeScreen extends JPanel {
         viewMenuButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // new CategoryFrame().setVisible(true); // (CategoryFrame 구현 후 주석 해제)
-                JOptionPane.showMessageDialog(HomeScreen.this, "메뉴 카테고리 창 띄우기 (미구현)");
+                mainScreen.displayCategoryScreen();
             }
         });
 
@@ -54,13 +58,14 @@ public class HomeScreen extends JPanel {
         });
     }
 
-    private void buildForm() {
+    private JPanel buildForm() {
         JPanel infoPanel = infoPanel();
         JPanel recommendPanel = recommendPanel();
         JPanel menuPanel = menuPanel();
 
-        GroupLayout formLayout = new GroupLayout(this);
-        setLayout(formLayout);
+        JPanel root = new JPanel();
+        GroupLayout formLayout = new GroupLayout(root);
+        root.setLayout(formLayout);
 
         formLayout.setAutoCreateGaps(false);
         formLayout.setAutoCreateContainerGaps(false);
@@ -69,7 +74,7 @@ public class HomeScreen extends JPanel {
         int PANEL_GAP = 30;
 
         formLayout.setHorizontalGroup(
-                formLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                formLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(infoPanel,
                                 GroupLayout.DEFAULT_SIZE,
                                 GroupLayout.DEFAULT_SIZE,
@@ -105,6 +110,7 @@ public class HomeScreen extends JPanel {
         );
 
         formLayout.linkSize(SwingConstants.HORIZONTAL, infoPanel, recommendPanel, menuPanel);
+        return root;
     }
 
     private JPanel infoPanel() {
