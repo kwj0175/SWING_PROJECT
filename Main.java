@@ -1,9 +1,9 @@
 import screen.MainScreen;
-import utils.ThemeColor;
+import theme.ThemeColor;
 
 public class Main {
     public static void main(String[] args) {
-        ThemeColor.applyThemeDark("utils/dark-ui.properties");
+        ThemeColor.applyThemeDark("theme/dark-ui.properties");
         MainScreen mainScreen = new MainScreen();
         mainScreen.run();
     }
