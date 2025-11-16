@@ -36,13 +36,13 @@ public class MainScreen extends JFrame {
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = c.gridy = 0;
-//        c.weightx = c.weighty = 1.0;
-//        c.fill = GridBagConstraints.BOTH;
+        c.weightx = c.weighty = 1.0;
+        c.fill = GridBagConstraints.BOTH;
         stage.add(cardPanel, c);
 
         loginScreen = new LoginScreen(this);
         homeScreen = new HomeScreen(this);
-        plannerScreen = new PlannerScreen();
+        plannerScreen = new PlannerScreen(this);
         categoryScreen = new CategoryScreen();
 
         cardPanel.add(loginScreen, "Login");
@@ -60,6 +60,10 @@ public class MainScreen extends JFrame {
 
     public void displayHomeScreen(User loggedInUser) {
         homeScreen.setCurrentUser(loggedInUser);
+        cardLayout.show(cardPanel, "Home");
+    }
+
+    public void displayHomeScreen() {
         cardLayout.show(cardPanel, "Home");
     }
 
