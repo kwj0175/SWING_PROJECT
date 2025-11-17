@@ -1,8 +1,10 @@
-import screen.MainDisplay;
+import screen.MainScreen;
+import theme.ThemeColor;
 
 public class Main {
     public static void main(String[] args) {
-        MainDisplay frame = new MainDisplay();
-        frame.setVisible(true);
+        ThemeColor.applyThemeDark("theme/dark-ui.properties");
+        MainScreen mainScreen = new MainScreen();
+        mainScreen.run();
     }
 }

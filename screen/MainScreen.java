@@ -1,7 +1,6 @@
 package screen;
 
 import entity.User;
-import entity.Recipe;  
 import screen.category.CategoryScreen;
 import screen.home.HomeScreen;
 import screen.login.LoginScreen;
@@ -21,7 +20,6 @@ public class MainScreen extends JFrame {
     private final PlannerScreen plannerScreen;
     private final LoginScreen loginScreen;
     private final CategoryScreen categoryScreen;
-    private final RecipeDetailPanel recipeDetailPanel; 
 
     public MainScreen() {
         setTitle("MySmartRecipe");
@@ -46,13 +44,11 @@ public class MainScreen extends JFrame {
         homeScreen = new HomeScreen(this);
         plannerScreen = new PlannerScreen(this);
         categoryScreen = new CategoryScreen();
-        recipeDetailPanel = new RecipeDetailPanel();
 
         cardPanel.add(loginScreen, "Login");
         cardPanel.add(homeScreen, "Home");
         cardPanel.add(plannerScreen, "Planner");
         cardPanel.add(categoryScreen, "Category");
-        cardPanel.add(recipeDetailPanel, "RecipeDetail");
 
         cardLayout.show(cardPanel, "Login");
         setVisible(true);
@@ -77,10 +73,6 @@ public class MainScreen extends JFrame {
 
     public void displayCategoryScreen() {
         cardLayout.show(cardPanel, "Category");
-    }
-    public void displayRecipeDetail(Recipe recipe) {
-        recipeDetailPanel.setRecipe(recipe);        
-        cardLayout.show(cardPanel, "RecipeDetail"); 
     }
 
 //    private void setBackgroundIMG(JLayeredPane layeredPane) {
