@@ -1,7 +1,5 @@
 package screen.planner;
 
-import screen.MainScreen;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -17,113 +15,23 @@ public class PlannerScreen extends JPanel {
     private JLabel weekLabel;
     private JLabel recipeTitleLabel;
     private JTextArea recipeContentArea;
-    private JButton homeBtn;
-    private JButton prevWeekBtn;
-    private JButton nextWeekBtn;
     private int currentWeek;
     private int currentMonth;
     private int currentYear;
 
-    public PlannerScreen(MainScreen mainScreen) {
+    public PlannerScreen() {
         setDate();
-        setLayout(new GridBagLayout());
-
-        JPanel form = buildForm();
-        JPanel backBtnPanel = buildBackBtnPanel();
-
-        JPanel root = new JPanel();
-        GroupLayout layout = new GroupLayout(root);
-        root.setLayout(layout);
-        root.setOpaque(false);
-
-        layout.setAutoCreateGaps(false);
-        layout.setAutoCreateContainerGaps(false);
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(backBtnPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(form, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addComponent(backBtnPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(form, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = c.gridy = 0;
-        c.weightx = 1.0;
-        c.weighty = 1.0;
-        c.fill = GridBagConstraints.BOTH;
-        add(root, c);
-
-        prevWeekBtnAction(prevWeekBtn);
-        nextWeekBtnAction(nextWeekBtn);
-
-        homeBtn.addActionListener(event -> {
-            System.out.println("홈 버튼 클릭됨");
-            mainScreen.displayHomeScreen();
-        });
-    }
-
-    private JPanel buildBackBtnPanel() {
-        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        homeBtn = new JButton("❮❮");
-        bar.add(setCustomButton(homeBtn));
-        return bar;
-    }
-
-    private JPanel buildForm() {
         JPanel topPanel = new JPanel();
+
         JScrollPane scrollPane = buildTable(topPanel);
         JPanel recipePanel = buildRecipe();
 
-        JPanel form = new JPanel();
-        GroupLayout formLayout = new GroupLayout(form);
-        form.setLayout(formLayout);
-
-        formLayout.setAutoCreateGaps(false);
-        formLayout.setAutoCreateContainerGaps(false);
-
-        int GAP = 5;
-        formLayout.setHorizontalGroup(
-                formLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(topPanel,
-                                GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE,
-                                Short.MAX_VALUE)
-                        .addComponent(scrollPane,
-                                GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE,
-                                Short.MAX_VALUE)
-                        .addComponent(recipePanel,
-                                GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.DEFAULT_SIZE,
-                                Short.MAX_VALUE)
-        );
-
-        // 세로: 위(top) - 가운데(scroll) - 아래(recipe) 순서로 배치
-        formLayout.setVerticalGroup(
-                formLayout.createSequentialGroup()
-                        .addComponent(topPanel,
-                                GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.PREFERRED_SIZE)
-                        .addGap(GAP)
-                        .addComponent(scrollPane,
-                                0,
-                                GroupLayout.DEFAULT_SIZE,
-                                Short.MAX_VALUE)   // ★ 가운데가 가변 높이
-                        .addGap(GAP)
-                        .addComponent(recipePanel,
-                                GroupLayout.PREFERRED_SIZE,
-                                GroupLayout.DEFAULT_SIZE,
-                                GroupLayout.PREFERRED_SIZE)
-        );
+        setLayout(new BorderLayout());
+        this.add(topPanel, BorderLayout.NORTH);
+        this.add(scrollPane, BorderLayout.CENTER);
+        this.add(recipePanel, BorderLayout.SOUTH);
 
         updateTableHeaders(); //초기 실행시 테이블 헤더 정상적으로 나타내도록 표시
-        return form;
     }
 
     private JPanel buildRecipe() {
@@ -182,20 +90,27 @@ public class PlannerScreen extends JPanel {
         return scrollPane;
     }
 
+    private void buttonListener(JButton homeBtn, JButton prevWeekBtn, JButton nextWeekBtn) {
+        prevWeekBtnAction(prevWeekBtn);
+        nextWeekBtnAction(nextWeekBtn);
+
+        homeBtn.addActionListener(event -> {
+            System.out.println("홈 버튼 클릭됨");
+            // 홈 버튼 클릭 시 동작 추가 가능
+        });
+    }
+
     private void buildButtons(JPanel topPanel) {
-    	topPanel.setLayout(new BorderLayout());
+        JButton homeBtn = new JButton("❮❮");// 좌상단 홈버튼
+        JButton prevWeekBtn = new JButton("❮");
+        JButton nextWeekBtn = new JButton("❯");
 
-        prevWeekBtn = new JButton("❮");
-        nextWeekBtn = new JButton("❯");
-        
-        // 가운데(중앙)에 주차 라벨
-        JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 0));
-        centerPanel.setOpaque(false);
-        centerPanel.add(setCustomButton(prevWeekBtn));
-        centerPanel.add(weekLabel);
-        centerPanel.add(setCustomButton(nextWeekBtn));
+        topPanel.add(setCustomButton(homeBtn));
+        topPanel.add(setCustomButton(prevWeekBtn));
+        topPanel.add(weekLabel);
+        topPanel.add(setCustomButton(nextWeekBtn));
 
-        topPanel.add(centerPanel, BorderLayout.CENTER);
+        buttonListener(homeBtn, prevWeekBtn, nextWeekBtn);
     }
 
     private void setDate() {
@@ -216,7 +131,7 @@ public class PlannerScreen extends JPanel {
                     currentYear--; // 연도 감소
                     currentMonth = 12; // 월을 12로 설정
                 }
-                currentWeek = 5; // 한달 최대 5주차까지
+                currentWeek = 4; // 주차를 4로 설정
             }
             updateWeekLabel(); // 주차 라벨 업데이트
             updateTableHeaders(); // 테이블 헤더 업데이트
@@ -227,7 +142,7 @@ public class PlannerScreen extends JPanel {
         // 다음주 버튼 클릭 이벤트
         button.addActionListener(event -> {
             currentWeek++;
-            if (currentWeek > 5) {
+            if (currentWeek > 4) {
                 currentMonth++; // 월 증가
                 if (currentMonth > 12) {
                     currentYear++; // 연도 증가
@@ -267,7 +182,7 @@ public class PlannerScreen extends JPanel {
                 int row = table.rowAtPoint(e.getPoint());
                 int col = table.columnAtPoint(e.getPoint());
 
-                if (col <= 0) return; // 잘못된 영역 클릭 방지
+                if (col < 0) return; // 잘못된 영역 클릭 방지
 
                 // 좌클릭 → 레시피 조회
                 if (SwingUtilities.isLeftMouseButton(e)) {
@@ -313,7 +228,7 @@ public class PlannerScreen extends JPanel {
     }
 
     private void updateTableHeaders() {
-    	// 현재 주의 시작 날짜 계산 (일요일 기준)
+    	// 현재 주의 시작 날짜 계산 (월요일 기준) 이었는데 일요일 기준으로 변경어디서 된지 모르겠음ㅋㅋ;;
         LocalDate startOfWeek = LocalDate.of(currentYear, currentMonth, 1)
             .with(WeekFields.of(Locale.getDefault()).weekOfMonth(), currentWeek)
             .with(WeekFields.of(Locale.getDefault()).dayOfWeek(), 1);

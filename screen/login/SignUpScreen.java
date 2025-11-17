@@ -1,7 +1,6 @@
 package screen.login;
 
 import manager.UserManager;
-import screen.utils.ScreenHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -71,24 +70,28 @@ public class SignUpScreen extends JDialog {
     }
 
     private JPanel buildForm() {
-        JLabel titleLabel = ScreenHelper.setText("회원가입", 24);
-        JLabel idLabel = ScreenHelper.setText("ID");
-        JLabel pwLabel = ScreenHelper.setText("PW");
-        JLabel nameLabel = ScreenHelper.setText("이름");
+        JLabel titleLabel = setLabelWithFont(new JLabel("회원가입"), "SansSerif", Font.BOLD, 24);
 
+        JLabel idLabel = new JLabel("ID");
         idField = new JTextField(20);
+        JLabel pwLabel = new JLabel("PW");
         pwField = new JPasswordField(20);
+        JLabel nameLabel = new JLabel("이름");
         nameField = new JTextField(20);
 
-        backButton = ScreenHelper.primaryButton("뒤로가기", 14);
-        signUpButton = ScreenHelper.primaryButton("회원가입", 14);
+        backButton = new JButton("뒤로가기");
+        signUpButton = new JButton("회원가입");
 
         int TEXT_FIELD_WIDTH = 180;
         int CONTAINER_GAP = 30;
         int ROW_GAP = 20;
 
-        JPanel form = ScreenHelper.darkCardPanel();
-        GroupLayout formLayout = ScreenHelper.groupLayout(form);
+        JPanel form = new JPanel();
+        GroupLayout formLayout = new GroupLayout(form);
+        form.setLayout(formLayout);
+
+        formLayout.setAutoCreateGaps(false);
+        formLayout.setAutoCreateContainerGaps(true);
 
         formLayout.setHorizontalGroup(
                 formLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -149,5 +152,10 @@ public class SignUpScreen extends JDialog {
         formLayout.linkSize(SwingConstants.HORIZONTAL, backButton, signUpButton);
 
         return form;
+    }
+
+    private JLabel setLabelWithFont(JLabel label, String font, int style, int size) {
+        label.setFont(new Font(font, style, size));
+        return label;
     }
 }
