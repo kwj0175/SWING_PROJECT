@@ -58,4 +58,10 @@ public class ScreenHelper {
         return groupLayout(panel, false, true);
     }
 
+    public static JButton secondaryButton(String text) {
+        JButton button = new JButton(text);
+        // (스타일 맞추기 위해 폰트, 색상 등 코드를 삽입하면 됩니다)
+
+        return button;
+    }
 }
