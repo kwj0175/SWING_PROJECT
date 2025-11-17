@@ -2,6 +2,7 @@ package screen.home;
 
 import entity.User;
 import screen.MainScreen;
+import screen.utils.ScreenHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +21,14 @@ public class HomeScreen extends JPanel {
 
     public HomeScreen(MainScreen mainScreen) {
         currentUser = null;
-        buildForm();
+        setOpaque(false);
+        setLayout(new GridBagLayout());
+        JPanel form = buildForm();
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = c.gridy = 0;
+        c.gridwidth = c.gridheight = 1;
+        c.fill = GridBagConstraints.BOTH;
+        add(form, c);
         // this.recipeManager = new RecipeManager(); // (RecipeManager 구현 후 주석 해제)
         // (RecipeManager 구현 후)
         // recommendedRecipes = recipeManager.getRandomRecipes(3); // 3개 랜덤 추출
@@ -40,8 +48,7 @@ public class HomeScreen extends JPanel {
         viewMenuButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // new CategoryFrame().setVisible(true); // (CategoryFrame 구현 후 주석 해제)
-                JOptionPane.showMessageDialog(HomeScreen.this, "메뉴 카테고리 창 띄우기 (미구현)");
+                mainScreen.displayCategoryScreen();
             }
         });
 
@@ -54,22 +61,19 @@ public class HomeScreen extends JPanel {
         });
     }
 
-    private void buildForm() {
+    private JPanel buildForm() {
         JPanel infoPanel = infoPanel();
         JPanel recommendPanel = recommendPanel();
         JPanel menuPanel = menuPanel();
 
-        GroupLayout formLayout = new GroupLayout(this);
-        setLayout(formLayout);
-
-        formLayout.setAutoCreateGaps(false);
-        formLayout.setAutoCreateContainerGaps(false);
+        JPanel root = ScreenHelper.noColorCardPanel();
+        GroupLayout formLayout = ScreenHelper.groupLayout(root, false, false);
 
         int TOP_BOTTOM_GAP = 10;
         int PANEL_GAP = 30;
 
         formLayout.setHorizontalGroup(
-                formLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                formLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
                         .addComponent(infoPanel,
                                 GroupLayout.DEFAULT_SIZE,
                                 GroupLayout.DEFAULT_SIZE,
@@ -105,19 +109,15 @@ public class HomeScreen extends JPanel {
         );
 
         formLayout.linkSize(SwingConstants.HORIZONTAL, infoPanel, recommendPanel, menuPanel);
+        return root;
     }
 
     private JPanel infoPanel() {
         JComponent profile = new ProfilePanel(50);
-        welcomeLabel = setLabelWithFont(new JLabel(""), "SansSerif", Font.BOLD, 18);
+        welcomeLabel = ScreenHelper.setText("", 18);
 
-        JPanel infoPanel = new JPanel();
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
-
-        GroupLayout formLayout = new GroupLayout(infoPanel);
-        infoPanel.setLayout(formLayout);
-        formLayout.setAutoCreateGaps(false);
-        formLayout.setAutoCreateContainerGaps(true);
+        JPanel infoPanel = ScreenHelper.noColorCardPanel();
+        GroupLayout formLayout = ScreenHelper.groupLayout(infoPanel);
 
         int HORIZONTAL_GAP = 30;
 
@@ -136,37 +136,27 @@ public class HomeScreen extends JPanel {
                         .addComponent(profile)
                         .addComponent(welcomeLabel)
         );
-
         return infoPanel;
+    }
+
+    private JLabel recommendMenu() {
+        JLabel recipeLabel  = ScreenHelper.setText("추천 메뉴 (클릭)");
+        recipeLabel.setBounds(70, 190, 200, 25);
+        recipeLabel.setForeground(Color.BLUE);
+        return recipeLabel;
     }
 
     private JPanel recommendPanel() {
         // 2. "오늘의 추천 메뉴" 영역
-        JLabel recommendTitle = setLabelWithFont(new JLabel("오늘의 추천 메뉴"), "SansSerif", Font.BOLD, 16);
-
-        // (임시) 추천 메뉴 1
-        JLabel recipeLabel1 = new JLabel("추천메뉴 1 (클릭)"); // + recommendedRecipes.get(0).getName()
-        recipeLabel1.setBounds(70, 190, 200, 25);
-        recipeLabel1.setForeground(Color.BLUE);
-
-        // (임시) 추천 메뉴 2
-        JLabel recipeLabel2 = new JLabel("추천메뉴 2 (클릭)"); // + recommendedRecipes.get(1).getName()
-        recipeLabel2.setBounds(70, 220, 200, 25);
-        recipeLabel2.setForeground(Color.BLUE);
+        JLabel recommendTitle = ScreenHelper.setText("오늘의 추천 메뉴", 16);
+        JLabel recipeLabel1 = recommendMenu();
+        JLabel recipeLabel2 = recommendMenu();
 
         int TITLE_GAP = 30;
         int RECIPE_GAP = 10;
 
-        JPanel recommendPanel = new JPanel();
-        recommendPanel.setOpaque(true);
-        recommendPanel.setBackground(Color.DARK_GRAY);
-        recommendPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
-
-        GroupLayout formLayout = new GroupLayout(recommendPanel);
-        recommendPanel.setLayout(formLayout);
-
-        formLayout.setAutoCreateGaps(false);
-        formLayout.setAutoCreateContainerGaps(true);
+        JPanel recommendPanel = ScreenHelper.darkCardPanel();
+        GroupLayout formLayout = ScreenHelper.groupLayout(recommendPanel);
 
         formLayout.setHorizontalGroup(
                 formLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -189,28 +179,15 @@ public class HomeScreen extends JPanel {
 
     private JPanel menuPanel() {
         // 3. 버튼 영역 (스케치 기반)
-        viewMenuButton = new JButton("메뉴 보기");
-        viewMenuButton.setBounds(50, 300, 180, 100);
-
-        viewFavoritesButton = new JButton("즐겨찾기");
-        viewFavoritesButton.setBounds(270, 300, 180, 50);
-
-        viewPlannerButton = new JButton("플래너");
-        viewPlannerButton.setBounds(50, 370, 180, 50);
+        viewMenuButton = ScreenHelper.secondaryButton("메뉴보기", 50, 300, 180, 100);
+        viewFavoritesButton = ScreenHelper.secondaryButton("즐겨찾기", 270, 300, 180, 50);
+        viewPlannerButton = ScreenHelper.secondaryButton("플래너", 50, 370, 180, 50);
 
         int HORIZONTAL_GAP = 50;
         int VERTICAL_GAP = 20;
 
-        JPanel menuPanel = new JPanel();
-        menuPanel.setOpaque(true);
-        menuPanel.setBackground(Color.DARK_GRAY);
-        menuPanel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
-
-        GroupLayout formLayout = new GroupLayout(menuPanel);
-        menuPanel.setLayout(formLayout);
-
-        formLayout.setAutoCreateGaps(true);
-        formLayout.setAutoCreateContainerGaps(true);
+        JPanel menuPanel = ScreenHelper.darkCardPanel();
+        GroupLayout formLayout = ScreenHelper.groupLayout(menuPanel, true, true);
 
         formLayout.setHorizontalGroup(
                 formLayout.createSequentialGroup()
@@ -243,10 +220,4 @@ public class HomeScreen extends JPanel {
         revalidate();
         repaint();
     }
-
-    private JLabel setLabelWithFont(JLabel label, String font, int style, int size) {
-        label.setFont(new Font(font, style, size));
-        return label;
-    }
-
 }
