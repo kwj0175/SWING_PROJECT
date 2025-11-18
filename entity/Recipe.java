@@ -2,81 +2,70 @@ package entity;
 
 public class Recipe {
 
-    private int id;                // 레시피 번호
-    private String name;           // 레시피 이름
-    private String category;       // 카테고리 (밥, 국, 찌개, 반찬 등)
-    private String ingredients;    // 재료 설명 (여러 줄 문자열)
-    private String steps;          // 조리 방법 (여러 줄 문자열)
+    private String name;
+    private String title;           // 레시피 이름
+    private FoodCategory category;       // 카테고리 (밥, 국, 찌개, 반찬 등)
+    private String[] details;    // 재료 설명 (여러 줄 문자열)
+    private String[] steps;          // 조리 방법 (여러 줄 문자열)
+    private String amount;
+    private String time;
     private String imagePath;      // 이미지 파일 경로
 
-    public Recipe() {
-    }
-
-    public Recipe(int id, String name, String category,
-                  String ingredients, String steps, String imagePath) {
-        this.id = id;
+    public Recipe(String name, String title,
+                   FoodCategory category, String[] details,
+                   String[] steps, String amount,
+                   String time, String imagePath) {
         this.name = name;
+        this.title = title;
         this.category = category;
-        this.ingredients = ingredients;
+        this.details = details;
         this.steps = steps;
+        this.amount = amount;
+        this.time = time;
         this.imagePath = imagePath;
     }
 
-    // ===== Getter / Setter =====
-
-    public int getId() {
-        return id;
+    public FoodCategory getCategory() {
+        return category;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public String getAmount() {
+        return amount;
+    }
+
+    public String getTime() {
+        return time;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getTitle() {
+        return title;
     }
 
-    public String getCategory() {
-        return category;
+    public String[] getDetails() {
+        return details;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getIngredients() {
-        return ingredients;
-    }
-
-    public void setIngredients(String ingredients) {
-        this.ingredients = ingredients;
-    }
-
-    public String getSteps() {
+    public String[] getSteps() {
         return steps;
-    }
-
-    public void setSteps(String steps) {
-        this.steps = steps;
     }
 
     public String getImagePath() {
         return imagePath;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public boolean checkCat(FoodCategory category) {
+        return this.getCategory().equals(category);
     }
 
     @Override
     public String toString() {
         return "Recipe{" +
-                "id=" + id +
                 ", name='" + name + '\'' +
+                ", title='" + title + '\'' +
                 ", category='" + category + '\'' +
                 '}';
     }
