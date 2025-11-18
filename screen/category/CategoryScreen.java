@@ -13,10 +13,12 @@ public class CategoryScreen extends JPanel {
     private JPanel cards; // CardLayout 영역
     private CardLayout cardLayout;
     private final ArrayList<Recipe> recipes;
+    private final MainScreen mainScreen;
 
     public CategoryScreen(MainScreen mainScreen, ArrayList<Recipe> recipes) {
         setLayout(new BorderLayout());
         this.recipes = recipes;
+        this.mainScreen = mainScreen;
         initComponents();
     }
 
@@ -85,6 +87,13 @@ public class CategoryScreen extends JPanel {
                 }
                 public void mouseExited(MouseEvent e) {
                     menuPanel.setBackground(new Color(245,245,245));
+                }
+            });
+
+            menuPanel.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent e) {
+                    System.out.println(recipe.getName() + " clicked");
+                    mainScreen.displayRecipeDetail(recipe);
                 }
             });
 

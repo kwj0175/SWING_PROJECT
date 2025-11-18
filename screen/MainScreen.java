@@ -65,7 +65,7 @@ public class MainScreen extends JFrame {
         cardPanel.add(homeScreen, "Home");
         cardPanel.add(plannerScreen, "Planner");
         cardPanel.add(categoryScreen, "Category");
-        cardPanel.add(recipeScreen, "RecipeDetail");
+        cardPanel.add(recipeScreen, "Recipe");
 
         cardLayout.show(cardPanel, "Login");
         setVisible(true);
