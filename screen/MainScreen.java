@@ -162,7 +162,7 @@ public class MainScreen extends JFrame {
 
 
         String imgDir = resolveImageDir(foodCategory);
-        String imagePath = "datasets/imgs/" + imgDir + "/" + name + ".jpg";
+        String imagePath = "datasets/imgs/" + imgDir + "/" + title + ".jpg";
 
         return new Recipe(
                 name,

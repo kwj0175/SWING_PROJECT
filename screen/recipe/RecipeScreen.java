@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import entity.Recipe;
 import screen.MainScreen;
 import screen.utils.ScreenHelper;
+import screen.utils.VerticalScrollPanel;
 
 public class RecipeScreen extends JPanel {
 
@@ -17,15 +18,16 @@ public class RecipeScreen extends JPanel {
     private JPanel detailsPanel;
     private JPanel stepsPanel;
 
-    private Recipe recipe;
-
     public RecipeScreen(MainScreen mainScreen) {
+        setOpaque(false);
         setLayout(new GridBagLayout());
+
         JPanel form = buildForm();
+
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = c.gridy = 0;
-        c.gridwidth = c.gridheight = 1;
-        c.fill = GridBagConstraints.BOTH;
+//        c.gridwidth = c.gridheight = 1;
+//        c.fill = GridBagConstraints.BOTH;
         add(form, c);
     }
 
@@ -33,26 +35,28 @@ public class RecipeScreen extends JPanel {
         nameLabel = ScreenHelper.setText("", 20);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JPanel namePanel = ScreenHelper.noColorCardPanel();
-//        namePanel.setLayout(new BorderLayout());
+        JPanel namePanel = ScreenHelper.darkCardPanel();
+        namePanel.setLayout(new BorderLayout());
         namePanel.add(nameLabel, BorderLayout.CENTER);
         return namePanel;
     }
 
     private void buildImgPanel() {
         imgPanel = ScreenHelper.noColorCardPanel();
+//        imgPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        imgPanel.setBorder(null);
         imgPanel.setPreferredSize(new Dimension(320, 200));
         imgPanel.setLayout(new BorderLayout());
     }
 
     private JPanel buildAmountTimePanel() {
-        amountLabel = ScreenHelper.setText("", 20);
-        timeLabel = ScreenHelper.setText("", 20);
+        amountLabel = ScreenHelper.setText("", 16);
+        timeLabel = ScreenHelper.setText("", 16);
 
-        JPanel amountTimePanel = ScreenHelper.noColorCardPanel();
+        JPanel amountTimePanel = ScreenHelper.darkCardPanel();
         GroupLayout formLayout = ScreenHelper.groupLayout(amountTimePanel);
 
-        int HORIZONTAL_GAP = 30;
+        int HORIZONTAL_GAP = 15;
 
         formLayout.setHorizontalGroup(
                 formLayout.createSequentialGroup()
@@ -72,51 +76,72 @@ public class RecipeScreen extends JPanel {
 
     private void buildDetailsPanel() {
         detailsPanel = new JPanel(new GridLayout(0, 2, 8, 8));
+        detailsPanel.setOpaque(false);
     }
 
     private void buildStepsPanel() {
         stepsPanel = new JPanel(new GridLayout(0, 1, 8, 8));
+        stepsPanel.setOpaque(false);
     }
 
     private JPanel buildForm() {
+        JPanel root = ScreenHelper.darkCardPanel();
+        root.setPreferredSize(new Dimension(320, 560));
+        root.setMaximumSize(new Dimension(320, 560));
+        root.setLayout(new BorderLayout(0, 15));
+
+        JPanel header = new JPanel();
+        header.setOpaque(false);
+        GroupLayout headerLayout = ScreenHelper.groupLayout(header);
+
         JPanel namePanel = buildNamePanel();
         buildImgPanel();
         JPanel amountTimePanel = buildAmountTimePanel();
+
+        headerLayout.setHorizontalGroup(
+                headerLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
+                        .addComponent(namePanel)
+                        .addComponent(imgPanel)
+                        .addComponent(amountTimePanel)
+        );
+
+        headerLayout.setVerticalGroup(
+                headerLayout.createSequentialGroup()
+                        .addComponent(namePanel)
+                        .addGap(15)
+                        .addComponent(imgPanel)
+                        .addGap(15)
+                        .addComponent(amountTimePanel)
+        );
+
         buildDetailsPanel();
         buildStepsPanel();
 
-        JPanel root = ScreenHelper.noColorCardPanel();
-        GroupLayout formLayout = ScreenHelper.groupLayout(root, false, false);
+        JPanel body = new VerticalScrollPanel();
+        body.setOpaque(false);
+        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
 
-        int GAP = 20;
-        formLayout.setHorizontalGroup(
-                formLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
-                        .addComponent(namePanel)
-                        .addComponent(imgPanel)
-                        .addComponent(amountTimePanel)
-                        .addComponent(detailsPanel)
-                        .addComponent(stepsPanel)
-        );
+        body.add(detailsPanel);
+        body.add(Box.createVerticalStrut(20));
+        body.add(stepsPanel);
 
-        formLayout.setVerticalGroup(
-                formLayout.createSequentialGroup()
-                        .addComponent(namePanel)
-                        .addGap(GAP)
-                        .addComponent(imgPanel)
-                        .addGap(GAP)
-                        .addComponent(amountTimePanel)
-                        .addGap(GAP)
-                        .addComponent(detailsPanel)
-                        .addGap(GAP)
-                        .addComponent(stepsPanel)
-        );
+        JScrollPane scrollPane = new JScrollPane(body);
+        scrollPane.setBorder(null);
+        scrollPane.setOpaque(false);
 
-        formLayout.linkSize(SwingConstants.HORIZONTAL, namePanel, imgPanel, amountTimePanel, detailsPanel, stepsPanel);
+        JViewport viewport = scrollPane.getViewport();
+        viewport.setOpaque(true);
+        viewport.setBackground(root.getBackground());
+
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        root.add(header, BorderLayout.NORTH);
+        root.add(scrollPane, BorderLayout.CENTER);
+
         return root;
     }
 
     public void setRecipe(Recipe recipe) {
-        this.recipe = recipe;
         nameLabel.setText(recipe.getName());
 
         imgPanel.removeAll();
@@ -132,7 +157,9 @@ public class RecipeScreen extends JPanel {
 
         detailsPanel.removeAll();
         for (String data: recipe.getDetails()) {
-            detailsPanel.add(ScreenHelper.setText(data, 10));
+            JLabel label = ScreenHelper.setText(data);
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            detailsPanel.add(label);
         }
         detailsPanel.revalidate();
         detailsPanel.repaint();
