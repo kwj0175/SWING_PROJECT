@@ -1,6 +1,7 @@
 package screen.category;
-import entity.Food;
 import entity.FoodCategory;
+import entity.Recipe;
+import screen.MainScreen;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,12 +12,11 @@ public class CategoryScreen extends JPanel {
     private JTextField inputField;
     private JPanel cards; // CardLayout 영역
     private CardLayout cardLayout;
-    private final Category category;
+    private final ArrayList<Recipe> recipes;
 
-    public CategoryScreen() {
+    public CategoryScreen(MainScreen mainScreen, ArrayList<Recipe> recipes) {
         setLayout(new BorderLayout());
-        category = new Category();
-        category.readFile();
+        this.recipes = recipes;
         initComponents();
     }
 
@@ -47,7 +47,7 @@ public class CategoryScreen extends JPanel {
         cards = new JPanel(cardLayout);
 
         for (FoodCategory cat : FoodCategory.values()) {
-            cards.add(createScrollPanel(category.getFoodsByCategory(cat)), cat.name());
+            cards.add(createScrollPanel(getRecipesByCategory(cat)), cat.name());
         }
 
         add(cards, BorderLayout.CENTER);
@@ -56,17 +56,26 @@ public class CategoryScreen extends JPanel {
         searchButton.addActionListener(e -> searchCurrentCard(inputField.getText().trim()));
     }
 
+    private ArrayList<Recipe> getRecipesByCategory(FoodCategory category) {
+        ArrayList<Recipe> r = new ArrayList<>();
+        for (Recipe recipe : recipes) {
+            if (recipe.checkCat(category))
+                r.add(recipe);
+        }
+        return r;
+    }
+
     // 스크롤 패널 생성
-    private JScrollPane createScrollPanel(ArrayList<Food> foods) {
+    private JScrollPane createScrollPanel(ArrayList<Recipe> recipes) {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(0,1,5,5));
 
-        for(Food food : foods) {
+        for(Recipe recipe : recipes) {
             JPanel menuPanel = new JPanel(new BorderLayout());
             menuPanel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
             menuPanel.setBackground(new Color(245,245,245));
 
-            JLabel label = new JLabel(food.getTitle());
+            JLabel label = new JLabel(recipe.getTitle());
             label.setFont(new Font("맑은 고딕", Font.BOLD, 10));
             menuPanel.add(label, BorderLayout.CENTER);
 
