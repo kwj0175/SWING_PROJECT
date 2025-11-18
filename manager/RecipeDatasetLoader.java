@@ -36,7 +36,7 @@ public class RecipeDatasetLoader {
 
     public static List<Recipe> loadMainSideDishes() {
         return loadFromFile(
-                "datasets/texts/main_side_dishes.txt",
+                "datasets/texts/main_dishes.txt",
                 "메인반찬",
                 "datasets/imgs/main_side_dishes/"
         );
@@ -81,64 +81,78 @@ public class RecipeDatasetLoader {
             String category,
             String imageFolder) {
 try {
-// ===== 1) 제목 / 재료 / 과정 위치 찾기 =====
-// " ...여기까지가 제목... [재료... ] [과정... ] 4인분..." 형태라고 가정
-int spaceBracket = line.indexOf(" [");   // 제목 뒤의 " [" (재료 시작 바로 앞)
-if (spaceBracket == -1) {
-System.out.println("포맷 이상 (재료 [ 못 찾음): " + line);
-return null;
+if (line == null) return null;
+line = line.trim();
+if (line.isEmpty()) return null;
+
+// 형식: 이름 | 제목 | 재료 | 과정 | 인분 | 시간
+String[] parts = line.split("\\|");
+
+
+if (parts.length < 1) {
+ System.out.println("포맷 이상(완전 이상한 줄): " + line);
+ return null;
 }
 
-// 제목(이미지 파일용) = 재료 [ 앞까지 전체
-String titleFull = line.substring(0, spaceBracket).trim();
-// 예: "[공모전] 뜨끈한 국물요리 소고기미역국"
+//부족한 칸은 그냥 빈 문자열로 채움
+String nameField = parts[0].trim();                                 // 이름
+String title     = (parts.length > 1 ? parts[1].trim() : nameField); // 제목 없으면 이름으로
+String ingredients = (parts.length > 2 ? parts[2].trim() : "");
+String stepsRaw    = (parts.length > 3 ? parts[3].trim() : "");
+String servings    = (parts.length > 4 ? parts[4].trim() : "");
+String time        = (parts.length > 5 ? parts[5].trim() : "");
 
-// 재료 [ 위치/ ] 위치
-int ingredOpen = spaceBracket + 1;                 // 실제 '[' 위치
-int ingredClose = line.indexOf(']', ingredOpen+1);
-String ingredients = line.substring(ingredOpen+1, ingredClose).trim();
-
-// 조리 과정 [ ] 찾기
-int stepsOpen = line.indexOf('[', ingredClose+1);
-int stepsClose = line.indexOf(']', stepsOpen+1);
-String stepsRaw = line.substring(stepsOpen+1, stepsClose).trim();
-
-// ===== 2) 조리 과정을 줄 나눠서 보기 좋게 =====
-String[] stepParts = stepsRaw.split("\\s*,\\s*");
+// ===== 조리 과정 보기 좋게 =====
 StringBuilder steps = new StringBuilder();
+if (!stepsRaw.isEmpty()) {
+String[] stepParts = stepsRaw.split("\\s*/\\s*"); // / 기준으로 나누기
 for (int i = 0; i < stepParts.length; i++) {
-steps.append(i + 1).append(". ").append(stepParts[i]);
+steps.append(i + 1).append(". ").append(stepParts[i].trim());
 if (i != stepParts.length - 1) steps.append("\n");
 }
-
-// ===== 3) 화면에 보여줄 이름 (태그/레시피 꼬리 제거는 옵션) =====
-String name = titleFull;
-
-
-// ===== 4) 이미지 파일 경로 만들기 =====
-//  ex) datasets/imgs/soups/[공모전] 뜨끈한 국물요리 소고기미역국.jpg
-String baseFileName = titleFull;
-
-// jpg 도 있고 png 도 있어서 둘 다 시도
-String jpgPath = imageFolder + baseFileName + ".jpg";
-String pngPath = imageFolder + baseFileName + ".png";
-
-String imagePath;
-java.io.File jpgFile = new java.io.File(jpgPath);
-java.io.File pngFile = new java.io.File(pngPath);
-
-if (jpgFile.exists()) {
-imagePath = jpgPath;
-} else if (pngFile.exists()) {
-imagePath = pngPath;
-} else {
-// 둘 다 없으면 일단 jpg 경로로 넣고, 화면에서는 "이미지 없음" 처리될 수도 있음
-imagePath = jpgPath;
-System.out.println("이미지 파일 없음: " + jpgPath + " / " + pngPath);
 }
 
-// 최종 Recipe 생성
-return new Recipe(id, name, category, ingredients, steps.toString(), imagePath);
+// 인분/시간 정보 뒤에 붙이기
+if (!servings.isEmpty() || !time.isEmpty()) {
+steps.append("\n\n");
+if (!servings.isEmpty()) steps.append("[인분] ").append(servings).append("\n");
+if (!time.isEmpty())     steps.append("[시간] ").append(time);
+}
+
+//===== 이미지 파일 경로 =====
+//제목(두 번째 칸) 기준
+String baseFileName = title.trim();   // 혹시 모를 앞뒤 공백 제거
+
+ClassLoader cl = RecipeDatasetLoader.class.getClassLoader();
+
+//후보 경로들: (1) 그대로, (2) 앞에 공백 하나
+String[] candidates = {
+     imageFolder + baseFileName + ".jpg",
+     imageFolder + baseFileName + ".png",
+     imageFolder + " " + baseFileName + ".jpg",
+     imageFolder + " " + baseFileName + ".png"
+};
+
+String imagePath = null;
+for (String path : candidates) {
+ if (cl.getResource(path) != null) {
+     imagePath = path;
+     break;
+ }
+}
+
+if (imagePath == null) {
+ // 그래도 못 찾으면 첫 번째 후보를 그냥 저장하고 로그만 찍기
+ imagePath = candidates[0];
+ System.out.println("이미지 리소스 없음: ");
+ for (String p : candidates) {
+     System.out.println("  - " + p);
+ }
+}
+
+//마지막에 Recipe 생성할 때 이 imagePath 넘김
+return new Recipe(id, title.trim(), category, ingredients, steps.toString(), imagePath);
+
 
 } catch (Exception e) {
 System.out.println("파싱 실패한 줄: " + line);

@@ -45,8 +45,8 @@ public class MainScreen extends JFrame {
         loginScreen = new LoginScreen(this);
         homeScreen = new HomeScreen(this);
         plannerScreen = new PlannerScreen(this);
-        categoryScreen = new CategoryScreen();
-        recipeDetailPanel = new RecipeDetailPanel();
+        categoryScreen = new CategoryScreen(this);
+        recipeDetailPanel = new RecipeDetailPanel(this);
 
         cardPanel.add(loginScreen, "Login");
         cardPanel.add(homeScreen, "Home");

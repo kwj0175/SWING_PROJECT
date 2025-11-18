@@ -1,6 +1,10 @@
 package screen.category;
 import entity.Food;
 import entity.FoodCategory;
+import entity.Recipe;
+import manager.RecipeDatasetLoader;
+import screen.MainScreen;
+
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,13 +16,17 @@ public class CategoryScreen extends JPanel {
     private JPanel cards; // CardLayout 영역
     private CardLayout cardLayout;
     private final Category category;
+    private final MainScreen mainScreen;
 
-    public CategoryScreen() {
+    public CategoryScreen(MainScreen mainScreen) {
+    	this.mainScreen = mainScreen;
+    	
         setLayout(new BorderLayout());
         category = new Category();
         category.readFile();
         initComponents();
     }
+    
 
     private void initComponents() {
         // 상단 입력바
@@ -47,7 +55,7 @@ public class CategoryScreen extends JPanel {
         cards = new JPanel(cardLayout);
 
         for (FoodCategory cat : FoodCategory.values()) {
-            cards.add(createScrollPanel(category.getFoodsByCategory(cat)), cat.name());
+            cards.add(createScrollPanel(category.getFoodsByCategory(cat),cat), cat.name());
         }
 
         add(cards, BorderLayout.CENTER);
@@ -55,11 +63,32 @@ public class CategoryScreen extends JPanel {
         // 검색 버튼 이벤트
         searchButton.addActionListener(e -> searchCurrentCard(inputField.getText().trim()));
     }
+    private java.util.List<Recipe> loadRecipesByCategory(FoodCategory cat) {
+        switch (cat) {
+            case SOUP:
+                return RecipeDatasetLoader.loadSoups();
+            case SIDE_DISH:
+                return RecipeDatasetLoader.loadSideDishes();
+            case RICE_DISH:
+                return RecipeDatasetLoader.loadRiceDishes();
+            case MAIN_SIDE_DISH:
+                return RecipeDatasetLoader.loadMainSideDishes();
+            default:
+                return Collections.emptyList();
+        }
+    }
 
     // 스크롤 패널 생성
-    private JScrollPane createScrollPanel(ArrayList<Food> foods) {
+    private JScrollPane createScrollPanel(ArrayList<Food> foods, FoodCategory cat) {
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(0,1,5,5));
+        
+        java.util.List<Recipe> recipeList = loadRecipesByCategory(cat);
+        
+        Map<String, Recipe> recipeMap = new HashMap<>();
+        for (Recipe r : recipeList) {
+            recipeMap.put(r.getName(), r);
+        }
 
         for(Food food : foods) {
             JPanel menuPanel = new JPanel(new BorderLayout());
@@ -71,11 +100,22 @@ public class CategoryScreen extends JPanel {
             menuPanel.add(label, BorderLayout.CENTER);
 
             menuPanel.addMouseListener(new MouseAdapter() {
-                public void mouseEntered(MouseEvent e) {
-                    menuPanel.setBackground(new Color(220,220,250));
-                }
-                public void mouseExited(MouseEvent e) {
-                    menuPanel.setBackground(new Color(245,245,245));
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    String title = food.getTitle();
+                    Recipe recipe = recipeMap.get(title);
+
+                    if (recipe != null) {
+                        // MainScreen의 상세 화면으로 전환
+                        mainScreen.displayRecipeDetail(recipe);
+                    } else {
+                        JOptionPane.showMessageDialog(
+                                CategoryScreen.this,
+                                "이 레시피에 대한 세부 정보가 없습니다:\n" + title,
+                                "세부정보 없음",
+                                JOptionPane.WARNING_MESSAGE
+                        );
+                    }
                 }
             });
 

@@ -41,27 +41,21 @@ public class Category {
         }
     }
 
-    private String extractTitle(String line) {//<제목>[재료][]
+    private String extractTitle(String line) {
         if (line == null) return "";
 
         line = line.trim();
         if (line.isEmpty()) return "";
 
-        int last = line.lastIndexOf('['); // 마지막 '['
-        if (last == -1) {
-            // [ ] 자체가 없으면 전체가 제목
+        // 형식: 이름 | 제목 | 재료 | 과정 | 인분 | 시간
+        String[] parts = line.split("\\|");
+        if (parts.length < 2) {
+            // 파이프가 없으면 그냥 전체 줄을 제목으로
             return line;
         }
 
-        // 마지막 '[' 앞에 있는 '[' → 뒤에서 두 번째 '['
-        int secondLast = line.lastIndexOf('[', last - 1);
-
-        if (secondLast == -1) {
-            // '['이 하나만 있는 경우 → 전체를 제목으로 간주
-            return line;
-        }
-        // 정상적인 제목
-        return line.substring(0, secondLast).trim();
+        // 0: 이름, 1: 제목
+        return parts[1].trim();
     }
 
     public ArrayList<Food> getFoodsByCategory(FoodCategory category) {

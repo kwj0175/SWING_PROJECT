@@ -1,38 +1,51 @@
 package screen;
 
+import entity.Recipe;
+
 import javax.swing.*;
 import java.awt.*;
 
-import entity.Recipe;
-
 public class RecipeDetailPanel extends JPanel {
+
+    private final MainScreen mainScreen;
 
     private JLabel nameLabel;
     private JLabel imgLabel;
     private JTextArea ingredientsArea;
     private JTextArea stepsArea;
 
-    public RecipeDetailPanel() {
+    public RecipeDetailPanel(MainScreen mainScreen) {
+        this.mainScreen = mainScreen;
         initUI();
-    }
-
-    public RecipeDetailPanel(Recipe recipe) {
-        initUI();
-        setRecipe(recipe);
     }
 
     private void initUI() {
         setLayout(new BorderLayout(5, 5));
         setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // ===== 제목 =====
+        // ===== 상단(제목 + X 버튼) =====
         nameLabel = new JLabel("레시피 이름", SwingConstants.CENTER);
-        nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+        nameLabel.setFont(new Font("맑은 고딕", Font.BOLD, 18));
 
-        // ===== 이미지 =====
+        JButton closeBtn = new JButton("X");
+        closeBtn.setMargin(new Insets(2, 8, 2, 8));
+        closeBtn.addActionListener(e -> {
+            clear();
+            mainScreen.displayCategoryScreen();   // 카테고리로 돌아가기
+        });
+
+        JPanel titlePanel = new JPanel(new BorderLayout());
+        titlePanel.add(nameLabel, BorderLayout.CENTER);
+        titlePanel.add(closeBtn, BorderLayout.EAST);
+
+        add(titlePanel, BorderLayout.NORTH);
+
+        // ===== 이미지 영역 (가운데 정렬) =====
         imgLabel = new JLabel("이미지 없음", SwingConstants.CENTER);
-        // 360x640 기준: 
         imgLabel.setPreferredSize(new Dimension(320, 200));
+
+        JPanel imagePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        imagePanel.add(imgLabel);
 
         // ===== 재료 =====
         ingredientsArea = new JTextArea();
@@ -42,10 +55,10 @@ public class RecipeDetailPanel extends JPanel {
 
         JScrollPane ingredientsScroll = new JScrollPane(ingredientsArea);
         ingredientsScroll.setBorder(BorderFactory.createTitledBorder("재료"));
-        // 재료는 얇게
-        ingredientsScroll.setPreferredSize(new Dimension(320, 60));
+        ingredientsScroll.setPreferredSize(new Dimension(320, 80)); // 높이 고정
+        ingredientsScroll.setMaximumSize(new Dimension(320, 80));
 
-        // ===== 조리 방법 =====
+        // ===== 조리 방법 (길어도 스크롤) =====
         stepsArea = new JTextArea();
         stepsArea.setLineWrap(true);
         stepsArea.setWrapStyleWord(true);
@@ -53,19 +66,20 @@ public class RecipeDetailPanel extends JPanel {
 
         JScrollPane stepsScroll = new JScrollPane(stepsArea);
         stepsScroll.setBorder(BorderFactory.createTitledBorder("조리 방법"));
+        stepsScroll.setPreferredSize(new Dimension(320, 220)); // 화면에 딱 맞게 높이
+        stepsScroll.setMaximumSize(new Dimension(320, 220));
 
-        // ===== 아래쪽(재료 + 조리방법) 배치 =====
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.Y_AXIS)); // 세로로 쌓기
+        // ===== 가운데 내용들을 세로로 쌓기 =====
+        JPanel centerContent = new JPanel();
+        centerContent.setLayout(new BoxLayout(centerContent, BoxLayout.Y_AXIS));
 
-        bottomPanel.add(ingredientsScroll);          // 위에 재료
-        bottomPanel.add(Box.createVerticalStrut(5)); // 간격 조금
-        bottomPanel.add(stepsScroll);                // 아래에 조리 방법 크게
+        centerContent.add(imagePanel);                  // 사진
+        centerContent.add(Box.createVerticalStrut(5));
+        centerContent.add(ingredientsScroll);           // 재료(스크롤)
+        centerContent.add(Box.createVerticalStrut(5));
+        centerContent.add(stepsScroll);                 // 조리방법(스크롤)
 
-        // ===== 전체 배치 =====
-        add(nameLabel, BorderLayout.NORTH);
-        add(imgLabel, BorderLayout.CENTER);
-        add(bottomPanel, BorderLayout.SOUTH);
+        add(centerContent, BorderLayout.CENTER);
     }
 
     public void setRecipe(Recipe recipe) {
@@ -78,20 +92,33 @@ public class RecipeDetailPanel extends JPanel {
         ingredientsArea.setText(recipe.getIngredients());
         stepsArea.setText(recipe.getSteps());
 
-        // 스크롤 맨 위로
         ingredientsArea.setCaretPosition(0);
         stepsArea.setCaretPosition(0);
 
-        // 이미지 로딩
+        // 이미지 로딩 (파일 경로 기준)
         String imagePath = recipe.getImagePath();
         if (imagePath != null && !imagePath.isEmpty()) {
-            ImageIcon icon = new ImageIcon(imagePath);
-            Image img = icon.getImage().getScaledInstance(320, 200, Image.SCALE_SMOOTH);
-            imgLabel.setIcon(new ImageIcon(img));
-            imgLabel.setText(null);
+            java.io.File imgFile = new java.io.File(imagePath);
+            if (imgFile.exists()) {
+                ImageIcon icon = new ImageIcon(imagePath);
+                if (icon.getIconWidth() > 0) {
+                    Image img = icon.getImage()
+                            .getScaledInstance(320, 200, Image.SCALE_SMOOTH);
+                    imgLabel.setIcon(new ImageIcon(img));
+                    imgLabel.setText(null);
+                } else {
+                    System.out.println("상세화면에서 이미지 로드 실패: " + imagePath);
+                    imgLabel.setIcon(null);
+                    imgLabel.setText("이미지 없음");
+                }
+            } else {
+                System.out.println("상세화면에서 이미지 파일 없음: " + imagePath);
+                imgLabel.setIcon(null);
+                imgLabel.setText("이미지 없음");
+            }
         } else {
             imgLabel.setIcon(null);
-            imgLabel.setText("이미지가 없습니다");
+            imgLabel.setText("이미지 없음");
         }
     }
 

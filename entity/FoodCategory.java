@@ -1,7 +1,7 @@
 package entity;
 
 public enum FoodCategory {
-    MAIN_SIDE_DISH("메인 반찬", "main_side_dishes"),
+    MAIN_SIDE_DISH("메인 반찬", "main_dishes"),
     RICE_DISH("밥류", "rice_dishes"),
     SIDE_DISH("반찬", "side_dishes"),
     SOUP("국/찌개", "soups");
