@@ -1,72 +1,66 @@
 package entity;
 
-public class Recipe {
+import manager.Manageable;
+import java.util.Scanner;
 
-    private String name;
-    private String title;           // 레시피 이름
-    private FoodCategory category;       // 카테고리 (밥, 국, 찌개, 반찬 등)
-    private String[] details;    // 재료 설명 (여러 줄 문자열)
-    private String[] steps;          // 조리 방법 (여러 줄 문자열)
-    private String amount;
-    private String time;
-    private String imagePath;      // 이미지 파일 경로
+public class Recipe implements Manageable {
+    // 화면 표시용 이름
+    private String displayName;
+    // 이미지 파일 매핑용
+    private String imageName;
 
-    public Recipe(String name, String title,
-                   FoodCategory category, String[] details,
-                   String[] steps, String amount,
-                   String time, String imagePath) {
-        this.name = name;
-        this.title = title;
-        this.category = category;
-        this.details = details;
-        this.steps = steps;
-        this.amount = amount;
-        this.time = time;
-        this.imagePath = imagePath;
+    private String category;
+    private String ingredients;
+    private String steps;        // 조리법
+    private String info;         // 인분 + 시간
+
+    private String title;
+
+    public Recipe() {}
+
+    @Override
+    public void read(Scanner sc) {
+        String line = sc.nextLine();
+        String[] parts = line.split("\\|");
+
+        if (parts.length >= 6) {
+            this.displayName = parts[0].trim();
+            this.imageName = parts[1].trim();
+            this.ingredients = parts[2].trim();
+            this.steps = parts[3].trim();
+            // 인분 + 시간 -> info
+            this.info = parts[4].trim() + " " + parts[5].trim();
+
+            this.title = this.displayName;
+        }
     }
 
-    public FoodCategory getCategory() {
-        return category;
-    }
+    //  Getters
+    public String getDisplayName() { return displayName != null ? displayName : "이름 없음"; }
+    public String getImageName() { return imageName; }
+    public String getCategory() { return category; }
+    public String getIngredients() { return ingredients; }
+    public String getSteps() { return steps; }
+    public String getInfo() { return info; }
 
-    public String getAmount() {
-        return amount;
-    }
+    public String getName() { return displayName; }
+    public String getTitle() { return displayName; }
 
-    public String getTime() {
-        return time;
-    }
+    public void setCategory(String category) { this.category = category; }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String[] getDetails() {
-        return details;
-    }
-
-    public String[] getSteps() {
-        return steps;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
-
-    public boolean checkCat(FoodCategory category) {
-        return this.getCategory().equals(category);
+    //  Manageable
+    @Override
+    public boolean matches(String kwd) {
+        if (displayName == null) return false;
+        return displayName.contains(kwd);
     }
 
     @Override
+    public String getId() { return displayName; }
+
+    @Override
     public String toString() {
-        return "Recipe{" +
-                ", name='" + name + '\'' +
-                ", title='" + title + '\'' +
-                ", category='" + category + '\'' +
-                '}';
+        return String.format("[%s] %s", category, displayName);
     }
+
 }
