@@ -34,7 +34,6 @@ public class HomeScreen extends JPanel {
         this.recipeManager = new RecipeManager();
         this.recommendedRecipes = recipeManager.getRecommendationsPerCategory();
 
-        // ⭐️ [수정 1] JScrollPane 삭제하고 바로 패널 추가
         JPanel form = buildForm();
         add(form, BorderLayout.CENTER);
     }
@@ -43,11 +42,8 @@ public class HomeScreen extends JPanel {
         JPanel infoPanel = infoPanel();
         JPanel recommendPanel = recommendPanel();
 
-        // ⭐️ [수정 2] BorderLayout 사용
-        // NORTH: 상단 정보 (높이 고정)
-        // CENTER: 추천 메뉴 (남은 공간 전부 차지 -> 자동으로 늘어나고 줄어듦)
         JPanel root = ScreenHelper.noColorCardPanel();
-        root.setLayout(new BorderLayout(0, 15)); // 상하 간격 15
+        root.setLayout(new BorderLayout(0, 15));
 
         root.add(infoPanel, BorderLayout.NORTH);
         root.add(recommendPanel, BorderLayout.CENTER);
@@ -102,15 +98,12 @@ public class HomeScreen extends JPanel {
     private JPanel recommendPanel() {
         JPanel container = new JPanel(new BorderLayout(0, 5));
         container.setOpaque(false);
-        container.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10)); // 하단 여백
+        container.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
 
         JLabel title = ScreenHelper.setText("오늘의 추천 메뉴", 16);
         title.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
 
-        // ⭐️ [수정 3] GridLayout(4, 1) 사용
-        // 무조건 4행 1열로 공간을 꽉 채우게 합니다.
-        // 화면이 작아지면 각 행의 높이도 같이 작아집니다.
-        recommendListPanel = new JPanel(new GridLayout(4, 1, 0, 10)); // 카드 간격 10
+        recommendListPanel = new JPanel(new GridLayout(4, 1, 0, 10));
         recommendListPanel.setOpaque(false);
 
         updateRecommendList();
@@ -128,7 +121,6 @@ public class HomeScreen extends JPanel {
                 recommendListPanel.add(createRecipeCard(r));
             }
         }
-        // 만약 추천 메뉴가 4개 미만일 경우 빈칸을 채워 모양 유지 (선택사항)
         for (int i = recommendListPanel.getComponentCount(); i < 4; i++) {
             JPanel empty = new JPanel();
             empty.setOpaque(false);
@@ -144,14 +136,10 @@ public class HomeScreen extends JPanel {
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10) // 내부 여백 약간 줄임
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
-        // ⭐️ [수정 4] 카드 크기 고정 코드(setPreferredSize) 삭제!
-        // GridLayout이 알아서 크기를 결정하도록 둡니다.
-
-        // 1. 이미지 (왼쪽)
         Component imgComp;
         String path = recipe.getImagePath();
 
@@ -161,9 +149,7 @@ public class HomeScreen extends JPanel {
         }
 
         if (path != null) {
-            // ⭐️ ImagePanel은 부모 패널 크기에 맞춰 알아서 줄어듭니다.
             ImagePanel imgPanel = new ImagePanel(path);
-            // 가로 길이는 고정하고 싶다면 설정 (세로는 자동 축소)
             imgPanel.setPreferredSize(new Dimension(110, 0));
             imgComp = imgPanel;
         } else {
@@ -174,8 +160,7 @@ public class HomeScreen extends JPanel {
             imgComp = noImg;
         }
 
-        // 2. 텍스트 정보 (중앙)
-        JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 0)); // 간격 최소화
+        JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 0));
         textPanel.setOpaque(false);
 
         String catName = (recipe.getCategory() != null) ? recipe.getCategory().getDisplayName() : "기타";

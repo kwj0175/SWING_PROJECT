@@ -51,12 +51,11 @@ public class RecipeManager {
             List<Recipe> matchedRecipes = new ArrayList<>();
             if (!inputIngredients.isEmpty()) {
                 for (Recipe r : catRecipes) {
-                    // details 배열을 돌며 확인
                     for (String ing : inputIngredients) {
                         for (String detail : r.getDetails()) {
                             if (detail.contains(ing)) {
                                 matchedRecipes.add(r);
-                                break; // 해당 재료 찾음
+                                break;
                             }
                         }
                         if (!matchedRecipes.isEmpty() && matchedRecipes.get(matchedRecipes.size()-1) == r) break;
@@ -86,10 +85,10 @@ public class RecipeManager {
             try (Scanner sc = new Scanner(file)) {
                 while (sc.hasNextLine()) {
                     Recipe r = new Recipe();
-                    r.read(sc); // 텍스트 파싱 (이미지 경로도 여기서 자동 설정됨)
+                    r.read(sc);
 
                     if (r.getTitle() != null) {
-                        r.setCategory(entry.getValue()); // Enum 카테고리 설정
+                        r.setCategory(entry.getValue());
                         allRecipes.add(r);
                     }
                 }

@@ -75,30 +75,26 @@ public class CategoryScreen extends JPanel {
     }
 
     private JScrollPane createScrollPanel(ArrayList<Recipe> recipes) {
-        // 2열 그리드
         JPanel panel = new JPanel(new GridLayout(0, 2, 15, 15));
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         panel.setBackground(Color.WHITE);
 
         for(Recipe recipe : recipes) {
-            // 카드 패널
             JPanel menuPanel = new JPanel(new BorderLayout());
             menuPanel.setBackground(Color.WHITE);
             menuPanel.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
             menuPanel.setPreferredSize(new Dimension(160, 160));
 
-            // 1. 이미지 (Recipe가 이미 parts[1]로 찾은 경로 사용)
             String path = recipe.getImagePath();
             Component imgComp;
 
-            // 혹시 경로가 없으면 다시 한번 parts[1](name)으로 찾아봄 (이중 안전장치)
             if (path == null) {
                 File f = ScreenHelper.findRecipeImage(recipe.getName());
                 if (f != null) path = f.getAbsolutePath();
             }
 
             if (path != null) {
-                imgComp = new ImagePanel(path); // 꽉 찬 이미지
+                imgComp = new ImagePanel(path);
             } else {
                 JLabel noImg = new JLabel("🍽️");
                 noImg.setFont(new Font("SansSerif", Font.PLAIN, 40));
@@ -108,7 +104,6 @@ public class CategoryScreen extends JPanel {
                 imgComp = noImg;
             }
 
-            // 2. 텍스트 라벨 (parts[0]인 Title 사용!)
             JLabel label = new JLabel(recipe.getTitle());
             label.setFont(new Font("맑은 고딕", Font.BOLD, 13));
             label.setHorizontalAlignment(SwingConstants.CENTER);
