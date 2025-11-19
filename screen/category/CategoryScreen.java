@@ -3,7 +3,8 @@ package screen.category;
 import entity.FoodCategory;
 import entity.Recipe;
 import screen.MainScreen;
-import screen.utils.ScreenHelper; // ⭐️ ScreenHelper import 필수
+import screen.recipe.ImagePanel;
+import screen.utils.ScreenHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +14,7 @@ import java.util.*;
 
 public class CategoryScreen extends JPanel {
     private JTextField inputField;
-    private JPanel cards; // CardLayout 영역
+    private JPanel cards;
     private CardLayout cardLayout;
     private final ArrayList<Recipe> recipes;
     private final MainScreen mainScreen;
@@ -26,20 +27,20 @@ public class CategoryScreen extends JPanel {
     }
 
     private void initComponents() {
-        // 1. 상단 검색바
+        // 상단바
         JPanel topPanel = new JPanel(new BorderLayout());
         inputField = new JTextField();
         JButton searchButton = new JButton("검색");
 
-        // 엔터키 이벤트
-        inputField.addActionListener(e -> searchCurrentCard(inputField.getText().trim()));
-        searchButton.addActionListener(e -> searchCurrentCard(inputField.getText().trim()));
+        ActionListener searchAction = e -> searchCurrentCard(inputField.getText().trim());
+        inputField.addActionListener(searchAction);
+        searchButton.addActionListener(searchAction);
 
         topPanel.add(inputField, BorderLayout.CENTER);
         topPanel.add(searchButton, BorderLayout.EAST);
         add(topPanel, BorderLayout.NORTH);
 
-        // 2. 카테고리 버튼 패널
+        // 카테고리 버튼
         JPanel categoryPanel = new JPanel(
                 new GridLayout(1, FoodCategory.values().length, 5, 5)
         );
@@ -48,17 +49,14 @@ public class CategoryScreen extends JPanel {
             JButton btn = new JButton(cat.getDisplayName());
             btn.setFont(new Font("SansSerif", Font.BOLD, 12));
             categoryPanel.add(btn);
-
-            // 버튼 클릭 시 해당 카테고리 화면으로 전환
             btn.addActionListener(e -> cardLayout.show(cards, cat.name()));
         }
         add(categoryPanel, BorderLayout.AFTER_LAST_LINE);
 
-        // 3. 중앙 리스트 영역
+        // 중앙 카드 영역
         cardLayout = new CardLayout();
         cards = new JPanel(cardLayout);
 
-        // 각 카테고리별로 패널 생성해서 카드에 추가
         for (FoodCategory cat : FoodCategory.values()) {
             cards.add(createScrollPanel(getRecipesByCategory(cat)), cat.name());
         }
@@ -66,12 +64,10 @@ public class CategoryScreen extends JPanel {
         add(cards, BorderLayout.CENTER);
     }
 
-    // 카테고리에 맞는 레시피 필터링
     private ArrayList<Recipe> getRecipesByCategory(FoodCategory category) {
         ArrayList<Recipe> r = new ArrayList<>();
         for (Recipe recipe : recipes) {
-            if (recipe.getCategory() != null &&
-                    recipe.getCategory().equals(category.getDisplayName())) {
+            if (recipe.checkCat(category)) {
                 r.add(recipe);
             }
         }
@@ -79,97 +75,96 @@ public class CategoryScreen extends JPanel {
     }
 
     private JScrollPane createScrollPanel(ArrayList<Recipe> recipes) {
-        JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        // 2열 그리드
+        JPanel panel = new JPanel(new GridLayout(0, 2, 15, 15));
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        panel.setBackground(Color.WHITE);
 
         for(Recipe recipe : recipes) {
-            // 개별 카드 패널
-            JPanel menuPanel = new JPanel(new BorderLayout(10, 0));
+            // 카드 패널
+            JPanel menuPanel = new JPanel(new BorderLayout());
             menuPanel.setBackground(Color.WHITE);
-            menuPanel.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 0, 1, 0, new Color(230, 230, 230)), // 하단 구분선
-                    BorderFactory.createEmptyBorder(10, 10, 10, 10) // 여백
-            ));
+            menuPanel.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+            menuPanel.setPreferredSize(new Dimension(160, 160));
 
-            // 높이 고정
-            menuPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+            // 1. 이미지 (Recipe가 이미 parts[1]로 찾은 경로 사용)
+            String path = recipe.getImagePath();
+            Component imgComp;
 
-            // 이미지 추가 (ScreenHelper 사용)
-            JLabel imgLabel = new JLabel();
-            File imgFile = ScreenHelper.findRecipeImage(recipe.getImageName());
-
-            if (imgFile != null) {
-                ImageIcon icon = new ImageIcon(imgFile.getAbsolutePath());
-                if (icon.getIconWidth() > 0) {
-                    Image img = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
-                    imgLabel.setIcon(new ImageIcon(img));
-                } else {
-                    imgLabel.setText("X");
-                }
-            } else {
-                imgLabel.setText("X"); // 이미지 없으면 X
-                imgLabel.setFont(new Font("SansSerif", Font.PLAIN, 30));
-                imgLabel.setHorizontalAlignment(SwingConstants.CENTER);
-                imgLabel.setPreferredSize(new Dimension(60, 60));
+            // 혹시 경로가 없으면 다시 한번 parts[1](name)으로 찾아봄 (이중 안전장치)
+            if (path == null) {
+                File f = ScreenHelper.findRecipeImage(recipe.getName());
+                if (f != null) path = f.getAbsolutePath();
             }
 
-            // 2. 텍스트 추가 (HTML 태그로 줄바꿈 지원)
-            String htmlTitle = "<html><body style='width: 200px'><b>" + recipe.getName() + "</b></body></html>";
-            JLabel textLabel = new JLabel(htmlTitle);
-            textLabel.setFont(new Font("맑은 고딕", Font.PLAIN, 13));
+            if (path != null) {
+                imgComp = new ImagePanel(path); // 꽉 찬 이미지
+            } else {
+                JLabel noImg = new JLabel("🍽️");
+                noImg.setFont(new Font("SansSerif", Font.PLAIN, 40));
+                noImg.setHorizontalAlignment(SwingConstants.CENTER);
+                noImg.setOpaque(true);
+                noImg.setBackground(new Color(240, 240, 240));
+                imgComp = noImg;
+            }
 
-            menuPanel.add(imgLabel, BorderLayout.WEST);
-            menuPanel.add(textLabel, BorderLayout.CENTER);
+            // 2. 텍스트 라벨 (parts[0]인 Title 사용!)
+            JLabel label = new JLabel(recipe.getTitle());
+            label.setFont(new Font("맑은 고딕", Font.BOLD, 13));
+            label.setHorizontalAlignment(SwingConstants.CENTER);
+            label.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
+            label.setOpaque(true);
+            label.setBackground(Color.WHITE);
 
-            // 3. 마우스 이벤트 (상세페이지 이동)
+            menuPanel.add(imgComp, BorderLayout.CENTER);
+            menuPanel.add(label, BorderLayout.SOUTH);
+
             menuPanel.addMouseListener(new MouseAdapter() {
                 public void mouseEntered(MouseEvent e) {
-                    menuPanel.setBackground(new Color(240, 245, 255));
+                    menuPanel.setBorder(BorderFactory.createLineBorder(new Color(100, 150, 255), 2));
                     menuPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 }
                 public void mouseExited(MouseEvent e) {
-                    menuPanel.setBackground(Color.WHITE);
+                    menuPanel.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
                 }
                 public void mouseClicked(MouseEvent e) {
                     mainScreen.displayRecipeDetail(recipe);
                 }
             });
 
-            contentPanel.add(menuPanel);
+            panel.add(menuPanel);
         }
 
         JPanel wrapper = new JPanel(new BorderLayout());
-        wrapper.add(contentPanel, BorderLayout.NORTH);
+        wrapper.setBackground(Color.WHITE);
+        wrapper.add(panel, BorderLayout.NORTH);
 
         JScrollPane scrollPane = new JScrollPane(wrapper);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         return scrollPane;
     }
 
-    // 현재 보이는 카드에서 검색 기능
     private void searchCurrentCard(String text) {
         Component current = getCurrentCard();
         if(current instanceof JScrollPane) {
             JScrollPane sp = (JScrollPane) current;
             JPanel wrapper = (JPanel) sp.getViewport().getView();
-            JPanel contentPanel = (JPanel) wrapper.getComponent(0);
+            JPanel gridPanel = (JPanel) wrapper.getComponent(0);
 
-            for(Component comp : contentPanel.getComponents()) {
+            for(Component comp : gridPanel.getComponents()) {
                 if(comp instanceof JPanel) {
                     JPanel card = (JPanel) comp;
-                    Component centerComp = ((BorderLayout)card.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+                    Component southComp = ((BorderLayout)card.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
 
-                    if(centerComp instanceof JLabel) {
-                        String htmlText = ((JLabel)centerComp).getText();
-                        // HTML 태그 제거 후 검색어 비교
-                        String rawText = htmlText.replaceAll("<[^>]*>", "");
-                        comp.setVisible(rawText.contains(text));
+                    if(southComp instanceof JLabel) {
+                        String title = ((JLabel) southComp).getText();
+                        comp.setVisible(title.contains(text));
                     }
                 }
             }
-            contentPanel.revalidate();
-            contentPanel.repaint();
+            gridPanel.revalidate();
+            gridPanel.repaint();
         }
     }
 
