@@ -27,6 +27,13 @@ public class LoginScreen extends JPanel {
         c.gridx = c.gridy = 0;
         add(form, c);
 
+        pwField.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginButton.doClick();
+            }
+        });
+
         // [로그인] 버튼 리스너
         loginButton.addActionListener(new ActionListener() {
             @Override

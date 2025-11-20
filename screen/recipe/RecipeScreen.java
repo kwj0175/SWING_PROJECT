@@ -142,8 +142,7 @@ public class RecipeScreen extends JPanel {
     }
 
     public void setRecipe(Recipe recipe) {
-        nameLabel.setText(recipe.getName());
-
+        nameLabel.setText(recipe.getTitle());
         imgPanel.removeAll();
         String imagePath = recipe.getImagePath();
         if (imagePath != null && !imagePath.isEmpty()) {

@@ -2,6 +2,8 @@ package screen.utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.text.Normalizer;
 
 public class ScreenHelper {
 
@@ -58,4 +60,47 @@ public class ScreenHelper {
         return groupLayout(panel, false, true);
     }
 
+    //파일 찾기
+    public static File findRecipeImage(String imageName) {
+        if (imageName == null || imageName.isEmpty()) return null;
+
+        String targetName = imageName.trim();
+        String targetNFC = Normalizer.normalize(targetName, Normalizer.Form.NFC);
+
+        File rootDir = new File("datasets/imgs");
+        if (rootDir.exists() && rootDir.isDirectory()) {
+            File[] subFolders = rootDir.listFiles();
+            if (subFolders != null) {
+                for (File folder : subFolders) {
+                    if (folder.isDirectory()) {
+                        File found = scanFolder(folder, targetNFC);
+                        if (found != null) return found;
+                    }
+                }
+            }
+        }
+
+        File srcDir = new File("src");
+        File foundInSrc = scanFolder(srcDir, targetNFC);
+        if (foundInSrc != null) return foundInSrc;
+
+        return null;
+    }
+
+    private static File scanFolder(File folder, String targetNFC) {
+        File[] files = folder.listFiles();
+        if (files == null) return null;
+
+        for (File f : files) {
+            if (f.isFile()) {
+                String fileName = f.getName();
+                String fileNFC = Normalizer.normalize(fileName, Normalizer.Form.NFC);
+
+                if (fileNFC.contains(targetNFC)) {
+                    return f;
+                }
+            }
+        }
+        return null;
+    }
 }

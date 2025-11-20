@@ -1,20 +1,29 @@
 package entity;
 
-public class Recipe {
+import manager.Manageable;
+import screen.utils.ScreenHelper; // ⭐️ 이미지 찾기 위해 추가
+
+import java.io.File;
+import java.util.Scanner;
+
+public class Recipe implements Manageable {
 
     private String name;
-    private String title;           // 레시피 이름
-    private FoodCategory category;       // 카테고리 (밥, 국, 찌개, 반찬 등)
-    private String[] details;    // 재료 설명 (여러 줄 문자열)
-    private String[] steps;          // 조리 방법 (여러 줄 문자열)
+    private String title;
+    private FoodCategory category;
+    private String[] details;
+    private String[] steps;
     private String amount;
     private String time;
-    private String imagePath;      // 이미지 파일 경로
+    private String imagePath;
+
+    // 기본 생성자 (필수)
+    public Recipe() {}
 
     public Recipe(String name, String title,
-                   FoodCategory category, String[] details,
-                   String[] steps, String amount,
-                   String time, String imagePath) {
+                  FoodCategory category, String[] details,
+                  String[] steps, String amount,
+                  String time, String imagePath) {
         this.name = name;
         this.title = title;
         this.category = category;
@@ -25,41 +34,57 @@ public class Recipe {
         this.imagePath = imagePath;
     }
 
-    public FoodCategory getCategory() {
-        return category;
+    @Override
+    public void read(Scanner sc) {
+        String line = sc.nextLine();
+        String[] parts = line.split("\\|");
+
+        if (parts.length >= 6) {
+            this.title = parts[0].trim();
+            this.name = parts[1].trim();
+            this.details = parts[2].trim().split(",");
+            for(int i=0; i<details.length; i++) details[i] = details[i].trim();
+            this.steps = parts[3].trim().split("/");
+            for(int i=0; i<steps.length; i++) steps[i] = steps[i].trim();
+
+            this.amount = parts[4].trim();
+            this.time = parts[5].trim();
+
+            File imgFile = ScreenHelper.findRecipeImage(this.name);
+            if (imgFile != null) {
+                this.imagePath = imgFile.getAbsolutePath();
+            } else {
+                this.imagePath = null;
+            }
+        }
     }
 
-    public String getAmount() {
-        return amount;
-    }
+    // Getters & Setters
 
-    public String getTime() {
-        return time;
-    }
+    public FoodCategory getCategory() { return category; }
+    public void setCategory(FoodCategory category) { this.category = category; }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String[] getDetails() {
-        return details;
-    }
-
-    public String[] getSteps() {
-        return steps;
-    }
-
-    public String getImagePath() {
-        return imagePath;
-    }
+    public String getAmount() { return amount; }
+    public String getTime() { return time; }
+    public String getName() { return name; }
+    public String getTitle() { return title; }
+    public String[] getDetails() { return details; }
+    public String[] getSteps() { return steps; }
+    public String getImagePath() { return imagePath; }
 
     public boolean checkCat(FoodCategory category) {
         return this.getCategory().equals(category);
     }
+
+    @Override
+    public boolean matches(String kwd) {
+        if (title == null) return false;
+        return title.contains(kwd);
+    }
+
+    @Override
+    public String getId() { return title; }
+
 
     @Override
     public String toString() {
