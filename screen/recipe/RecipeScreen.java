@@ -20,15 +20,11 @@ public class RecipeScreen extends JPanel {
 
     public RecipeScreen(MainScreen mainScreen) {
         setOpaque(false);
-        setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
 
         JPanel form = buildForm();
 
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = c.gridy = 0;
-//        c.gridwidth = c.gridheight = 1;
-//        c.fill = GridBagConstraints.BOTH;
-        add(form, c);
+        add(form, BorderLayout.CENTER);
     }
 
     private JPanel buildNamePanel() {
@@ -43,7 +39,6 @@ public class RecipeScreen extends JPanel {
 
     private void buildImgPanel() {
         imgPanel = ScreenHelper.noColorCardPanel();
-//        imgPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         imgPanel.setBorder(null);
         imgPanel.setPreferredSize(new Dimension(320, 200));
         imgPanel.setLayout(new BorderLayout());
@@ -86,8 +81,7 @@ public class RecipeScreen extends JPanel {
 
     private JPanel buildForm() {
         JPanel root = ScreenHelper.darkCardPanel();
-        root.setPreferredSize(new Dimension(320, 560));
-        root.setMaximumSize(new Dimension(320, 560));
+        root.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 10));
         root.setLayout(new BorderLayout(0, 15));
 
         JPanel header = new JPanel();
@@ -142,7 +136,8 @@ public class RecipeScreen extends JPanel {
     }
 
     public void setRecipe(Recipe recipe) {
-        nameLabel.setText(recipe.getTitle());
+        nameLabel.setText(recipe.getName());
+
         imgPanel.removeAll();
         String imagePath = recipe.getImagePath();
         if (imagePath != null && !imagePath.isEmpty()) {
