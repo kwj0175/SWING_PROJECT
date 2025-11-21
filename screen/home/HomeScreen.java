@@ -12,6 +12,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HomeScreen extends JPanel {
@@ -23,7 +24,7 @@ public class HomeScreen extends JPanel {
     private JLabel welcomeLabel;
     private JPanel recommendListPanel;
 
-    public HomeScreen(MainScreen mainScreen) {
+    public HomeScreen(MainScreen mainScreen, ArrayList<Recipe> recipes) {
         this.mainScreen = mainScreen;
         currentUser = null;
         setOpaque(false);
@@ -31,7 +32,7 @@ public class HomeScreen extends JPanel {
 
         setLayout(new BorderLayout());
 
-        this.recipeManager = new RecipeManager();
+        this.recipeManager = new RecipeManager(recipes);
         this.recommendedRecipes = recipeManager.getRecommendationsPerCategory();
 
         JPanel form = buildForm();
@@ -143,11 +144,6 @@ public class HomeScreen extends JPanel {
         Component imgComp;
         String path = recipe.getImagePath();
 
-        if (path == null || path.isEmpty()) {
-            File f = ScreenHelper.findRecipeImage(recipe.getName());
-            if (f != null) path = f.getAbsolutePath();
-        }
-
         if (path != null) {
             ImagePanel imgPanel = new ImagePanel(path);
             imgPanel.setPreferredSize(new Dimension(110, 0));
@@ -164,7 +160,7 @@ public class HomeScreen extends JPanel {
         textPanel.setOpaque(false);
 
         String catName = (recipe.getCategory() != null) ? recipe.getCategory().getDisplayName() : "기타";
-        JLabel nameLabel = new JLabel("<html><b>[" + catName + "]</b><br>" + recipe.getTitle() + "</html>");
+        JLabel nameLabel = new JLabel("<html><b>[" + catName + "]</b><br>" + recipe.getName() + "</html>");
         nameLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
         String infoText = recipe.getAmount() + " | " + recipe.getTime();
