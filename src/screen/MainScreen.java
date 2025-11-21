@@ -64,7 +64,9 @@ public class MainScreen extends JFrame implements NavigationHandler {
         plannerScreen = new PlannerScreen(this);
         categoryScreen = new CategoryScreen(this, recipeManager);
         recipeScreen = new RecipeScreen(this);
+    }
 
+    public void run() {
         cardPanel.add(loginScreen, "Login");
         cardPanel.add(homeScreen, "Home");
         cardPanel.add(plannerScreen, "Planner");
