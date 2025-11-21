@@ -2,100 +2,88 @@ package manager;
 
 import entity.FoodCategory;
 import entity.Recipe;
-import java.io.File;
 import java.util.*;
 
 public class RecipeManager {
-    private ArrayList<Recipe> allRecipes = new ArrayList<>();
-    private Random random = new Random();
+    private final List<Recipe> recipes;
+    private final Map<FoodCategory, List<Recipe>> recipesByCategory = new EnumMap<>(FoodCategory.class);
+    private final Random random = new Random();
 
-    private static final String FILE_PATH = "datasets/texts/";
-
-    // 파일명 -> Enum 매핑
-    private static final Map<String, FoodCategory> FILE_TO_ENUM_MAP = Map.of(
-            "main_side_dishes.txt", FoodCategory.MAIN_SIDE_DISH,
-            "rice_dishes.txt", FoodCategory.RICE_DISH,
-            "side_dishes.txt", FoodCategory.SIDE_DISH,
-            "soups.txt", FoodCategory.SOUP
-    );
-
-    public RecipeManager() {
-        loadRecipesFromAllFiles();
+    public RecipeManager(ArrayList<Recipe> recipes) {
+        this.recipes = recipes;
+        sortByCategory();
     }
 
     public List<Recipe> getRecommendationsPerCategory() {
         return getRecommendationsByIngredients(null);
     }
 
-    // 재료 기반 추천 로직 (Enum 사용)
-    public List<Recipe> getRecommendationsByIngredients(String userIngredients) {
-        List<Recipe> results = new ArrayList<>();
-        FoodCategory[] categories = FoodCategory.values();
+    private void sortByCategory() {
+        for (FoodCategory category : FoodCategory.values()) {
+            recipesByCategory.put(category, new ArrayList<>());
+        }
+        for (Recipe recipe : recipes) {
+            recipesByCategory.get(recipe.getCategory()).add(recipe);
+        }
+    }
 
-        List<String> inputIngredients = new ArrayList<>();
-        if (userIngredients != null && !userIngredients.trim().isEmpty()) {
-            String[] split = userIngredients.split("[,\\s]+");
-            inputIngredients.addAll(Arrays.asList(split));
+    private Set<String> parseUserInput(String input) {
+        Set<String> set = new HashSet<>();
+
+        if (input == null || input.trim().isEmpty()) {
+            return set;
         }
 
-        for (FoodCategory cat : categories) {
-            List<Recipe> catRecipes = new ArrayList<>();
-            for (Recipe r : allRecipes) {
-                if (r.checkCat(cat)) {
-                    catRecipes.add(r);
+        String[] keywords = input.split("[,\\s]+");
+        for (String key : keywords) {
+            String norm = key.trim();
+            if (!norm.isEmpty()) set.add(norm);
+            System.out.println(norm);
+        }
+        return set;
+    }
+
+    // 입력 없음 OR 점수 0 -> 랜덤
+    // 점수 가장 높은 레시피 pick
+    // 같은 점수끼리는 랜덤
+    private Recipe pickBestRecipe(List<Recipe> candidates, Set<String> userSet) {
+        if (userSet.isEmpty()) {
+            return candidates.get(random.nextInt(candidates.size()));
+        }
+
+        Recipe best = null;
+        int bestScore = 0;
+
+        for (Recipe recipe : candidates) {
+            int score = recipe.matchScore(userSet);
+            if (score > bestScore) {
+                bestScore = score;
+                best = recipe;
+            } else if (score == bestScore && score > 0) {
+                if (random.nextBoolean()) {
+                    best = recipe;
                 }
             }
+            System.out.println("Score: " + score + "재료: " + recipe.getDetails());
+        }
 
+        if (best != null) {
+            return best;
+        }
+        return candidates.get(random.nextInt(candidates.size()));
+    }
+
+    public List<Recipe> getRecommendationsByIngredients(String input) {
+        Set<String> userSet = parseUserInput(input);
+        List<Recipe> results = new ArrayList<>();
+
+        for (FoodCategory cat : FoodCategory.values()) {
+            List<Recipe> catRecipes = recipesByCategory.get(cat);
             if (catRecipes.isEmpty()) continue;
 
-            List<Recipe> matchedRecipes = new ArrayList<>();
-            if (!inputIngredients.isEmpty()) {
-                for (Recipe r : catRecipes) {
-                    for (String ing : inputIngredients) {
-                        for (String detail : r.getDetails()) {
-                            if (detail.contains(ing)) {
-                                matchedRecipes.add(r);
-                                break;
-                            }
-                        }
-                        if (!matchedRecipes.isEmpty() && matchedRecipes.get(matchedRecipes.size()-1) == r) break;
-                    }
-                }
-            }
-
-            if (!matchedRecipes.isEmpty()) {
-                results.add(matchedRecipes.get(random.nextInt(matchedRecipes.size())));
-            } else {
-                results.add(catRecipes.get(random.nextInt(catRecipes.size())));
-            }
+            Recipe recipe = pickBestRecipe(catRecipes, userSet);
+            results.add(recipe);
         }
         return results;
-    }
-
-    public ArrayList<Recipe> getAllRecipes() {
-        return allRecipes;
-    }
-
-    private void loadRecipesFromAllFiles() {
-        for (Map.Entry<String, FoodCategory> entry : FILE_TO_ENUM_MAP.entrySet()) {
-            File file = new File(FILE_PATH + entry.getKey());
-
-            if (!file.exists()) continue;
-
-            try (Scanner sc = new Scanner(file)) {
-                while (sc.hasNextLine()) {
-                    Recipe r = new Recipe();
-                    r.read(sc);
-
-                    if (r.getTitle() != null) {
-                        r.setCategory(entry.getValue());
-                        allRecipes.add(r);
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        System.out.println("총 " + allRecipes.size() + "개의 레시피 로드 완료.");
     }
 }
