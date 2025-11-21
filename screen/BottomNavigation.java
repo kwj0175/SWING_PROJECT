@@ -20,12 +20,21 @@ public class BottomNavigation extends JPanel{
 
         navigationPanel = createNavigationPanel();
         navigationPanel.setVisible(false);
+        navigationPanel.setPreferredSize(new Dimension(0, 50));
 
         add(navigationPanel, BorderLayout.CENTER);
     }
 
     public void showBar() {
         navigationPanel.setVisible(true);
+    }
+
+    private JButton customizeButton(JButton button) {
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setOpaque(false);
+        return button;
     }
 
     private JPanel createNavigationPanel() {
@@ -42,12 +51,11 @@ public class BottomNavigation extends JPanel{
 
         JPanel panel = new JPanel(new GridLayout(1, 4, 5, 5));
         panel.setBackground(Color.LIGHT_GRAY);
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        panel.add(homeButton);
-        panel.add(viewMenuButton);
-        panel.add(viewPlannerButton); // (순서는 원하시는대로 배치)
-        panel.add(viewFavoritesButton);
+        panel.add(customizeButton(homeButton));
+        panel.add(customizeButton(viewMenuButton));
+        panel.add(customizeButton(viewPlannerButton));
+        panel.add(customizeButton(viewFavoritesButton));
 
         // --- 버튼 리스너 연결 ---
         homeButton.addActionListener(new ActionListener() {
