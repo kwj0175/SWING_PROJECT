@@ -1,27 +1,21 @@
 package entity;
 
-import manager.Manageable;
-import screen.utils.ScreenHelper; // ⭐️ 이미지 찾기 위해 추가
+import java.util.List;
+import java.util.Set;
 
-import java.io.File;
-import java.util.Scanner;
+public class Recipe {
 
-public class Recipe implements Manageable {
-
-    private String name;
-    private String title;
-    private FoodCategory category;
-    private String[] details;
-    private String[] steps;
-    private String amount;
-    private String time;
-    private String imagePath;
-
-    // 기본 생성자 (필수)
-    public Recipe() {}
+    private final String name;
+    private final String title;
+    private final FoodCategory category;
+    private final List<String> details;
+    private final String[] steps;
+    private final String amount;
+    private final String time;
+    private final String imagePath;
 
     public Recipe(String name, String title,
-                  FoodCategory category, String[] details,
+                  FoodCategory category, List<String> details,
                   String[] steps, String amount,
                   String time, String imagePath) {
         this.name = name;
@@ -34,41 +28,14 @@ public class Recipe implements Manageable {
         this.imagePath = imagePath;
     }
 
-    @Override
-    public void read(Scanner sc) {
-        String line = sc.nextLine();
-        String[] parts = line.split("\\|");
-
-        if (parts.length >= 6) {
-            this.title = parts[0].trim();
-            this.name = parts[1].trim();
-            this.details = parts[2].trim().split(",");
-            for(int i=0; i<details.length; i++) details[i] = details[i].trim();
-            this.steps = parts[3].trim().split("/");
-            for(int i=0; i<steps.length; i++) steps[i] = steps[i].trim();
-
-            this.amount = parts[4].trim();
-            this.time = parts[5].trim();
-
-            File imgFile = ScreenHelper.findRecipeImage(this.name);
-            if (imgFile != null) {
-                this.imagePath = imgFile.getAbsolutePath();
-            } else {
-                this.imagePath = null;
-            }
-        }
-    }
-
-    // Getters & Setters
+    // Getters
 
     public FoodCategory getCategory() { return category; }
-    public void setCategory(FoodCategory category) { this.category = category; }
-
     public String getAmount() { return amount; }
     public String getTime() { return time; }
     public String getName() { return name; }
     public String getTitle() { return title; }
-    public String[] getDetails() { return details; }
+    public List<String> getDetails() { return details; }
     public String[] getSteps() { return steps; }
     public String getImagePath() { return imagePath; }
 
@@ -76,15 +43,14 @@ public class Recipe implements Manageable {
         return this.getCategory().equals(category);
     }
 
-    @Override
-    public boolean matches(String kwd) {
-        if (title == null) return false;
-        return title.contains(kwd);
+    public int matchScore(Set<String> userDetails) {
+        int score = 0;
+        for (String str : userDetails) {
+            if (details.stream().anyMatch(s -> s.contains(str)))
+                score++;
+        }
+        return score;
     }
-
-    @Override
-    public String getId() { return title; }
-
 
     @Override
     public String toString() {
