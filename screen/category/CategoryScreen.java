@@ -11,12 +11,13 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.util.*;
+import java.util.List;
 
 public class CategoryScreen extends JPanel {
     private JTextField inputField;
     private JPanel cards;
     private CardLayout cardLayout;
-    private final ArrayList<Recipe> recipes;
+    private final List<Recipe> recipes;
     private final MainScreen mainScreen;
 
     public CategoryScreen(MainScreen mainScreen, ArrayList<Recipe> recipes) {
@@ -88,10 +89,10 @@ public class CategoryScreen extends JPanel {
             String path = recipe.getImagePath();
             Component imgComp;
 
-            if (path == null) {
-                File f = ScreenHelper.findRecipeImage(recipe.getName());
-                if (f != null) path = f.getAbsolutePath();
-            }
+//            if (path == null) {
+//                File f = ScreenHelper.findRecipeImage(recipe.getName());
+//                if (f != null) path = f.getAbsolutePath();
+//            }
 
             if (path != null) {
                 imgComp = new ImagePanel(path);
