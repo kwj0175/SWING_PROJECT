@@ -32,7 +32,7 @@ public class HomeScreen extends JPanel {
 
         currentUser = null;
         setOpaque(false);
-        welcomeLabel = ScreenHelper.setText(" ", 18);
+        welcomeLabel = ScreenHelper.setText(" ", 16);
 
         setLayout(new BorderLayout());
 
@@ -55,7 +55,7 @@ public class HomeScreen extends JPanel {
         JPanel recommendPanel = recommendPanel();
 
         JPanel root = ScreenHelper.noColorCardPanel();
-        root.setLayout(new BorderLayout(0, 15));
+        root.setLayout(new BorderLayout(0, 25));
 
         root.add(infoPanel, BorderLayout.NORTH);
         root.add(recommendPanel, BorderLayout.CENTER);
@@ -86,23 +86,97 @@ public class HomeScreen extends JPanel {
 
         JPanel infoPanel = ScreenHelper.noColorCardPanel();
         infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        infoPanel.setLayout(new BorderLayout(20, 0));
 
-        infoPanel.add(fridgeBtn, BorderLayout.WEST);
-        infoPanel.add(welcomeLabel, BorderLayout.CENTER);
+        infoPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 15, 0));
+        infoPanel.add(fridgeBtn);
+        infoPanel.add(welcomeLabel);
 
         return infoPanel;
     }
 
     private void showIngredientDialog() {
-        String input = JOptionPane.showInputDialog(this,
-                "냉장고 재료를 입력하세요 (쉼표 구분)\n예: 두부, 계란, 대파",
-                "재료 기반 추천",
-                JOptionPane.QUESTION_MESSAGE);
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        JDialog dialog = new JDialog((Frame) parentWindow, "재료 기반 추천", true);
+        dialog.setLayout(new BorderLayout());
+        dialog.setResizable(false);
 
-        if (input != null) {
-            homePresenter.onIngredientsSubmitted(input);
-        }
+        JPanel rootPanel = new JPanel(new BorderLayout(0, 15));
+        rootPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        rootPanel.setBackground(Color.WHITE);
+
+        JPanel contentPanel = new JPanel(new BorderLayout(15, 0)); // 아이콘과 텍스트 사이 간격
+        contentPanel.setOpaque(false);
+
+        // 아이콘 설정
+        ImageIcon icon = null;
+        try {
+            java.net.URL imgURL = getClass().getResource("/src/fridge(icon).png");
+            if (imgURL == null) imgURL = getClass().getResource("/fridge(icon).png");
+            if (imgURL == null) {
+                ImageIcon temp = new ImageIcon("src/fridge(icon).png");
+                if(temp.getIconWidth() > 0) icon = temp;
+            } else {
+                icon = new ImageIcon(imgURL);
+            }
+
+            if (icon != null) {
+                Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                icon = new ImageIcon(img);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        JLabel iconLabel = new JLabel();
+        if (icon != null) iconLabel.setIcon(icon);
+        iconLabel.setVerticalAlignment(SwingConstants.TOP);
+        contentPanel.add(iconLabel, BorderLayout.WEST);
+
+        JPanel rightGroupPanel = new JPanel(new BorderLayout(0, 8));
+        rightGroupPanel.setOpaque(false);
+
+        JLabel textLabel = new JLabel("<html>냉장고 재료를 입력하세요 (쉼표 구분)<br>예: 두부, 계란, 대파</html>");
+        textLabel.setFont(new Font("SansSerif", Font.PLAIN, 13));
+
+        JTextField inputField = new JTextField();
+        //입력 창 크기
+        inputField.setPreferredSize(new Dimension(220, 30)); // 너비 220, 높이 30
+
+        // 입력창이 늘어나지 않게 잡아주는 래퍼 패널
+        JPanel inputWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        inputWrapper.setOpaque(false);
+        inputWrapper.add(inputField);
+
+        rightGroupPanel.add(textLabel, BorderLayout.NORTH);
+        rightGroupPanel.add(inputWrapper, BorderLayout.CENTER);
+
+        contentPanel.add(rightGroupPanel, BorderLayout.CENTER);
+
+        //하단 버튼 영역
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        buttonPanel.setOpaque(false);
+
+        JButton confirmBtn = new JButton("확인");
+        confirmBtn.setFocusPainted(false);
+        confirmBtn.setBackground(new Color(240, 240, 240));
+
+        buttonPanel.add(confirmBtn);
+        rootPanel.add(contentPanel, BorderLayout.CENTER);
+        rootPanel.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.add(rootPanel);
+
+        // 4. 이벤트 처리
+        java.awt.event.ActionListener action = e -> {
+            String input = inputField.getText();
+            dialog.dispose();
+            if (input != null && !input.trim().isEmpty()) {
+                homePresenter.onIngredientsSubmitted(input);
+            }
+        };
+        confirmBtn.addActionListener(action);
+        inputField.addActionListener(action);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
     }
 
     private JPanel recommendPanel() {
@@ -165,8 +239,10 @@ public class HomeScreen extends JPanel {
             imgComp = noImg;
         }
 
-        JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 0));
+        JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 6));
         textPanel.setOpaque(false);
+
+        textPanel.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
 
         String catName = (recipe.getCategory() != null) ? recipe.getCategory().getDisplayName() : "기타";
         JLabel nameLabel = new JLabel("<html><b>[" + catName + "]</b><br>" + recipe.getName() + "</html>");
