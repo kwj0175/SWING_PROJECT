@@ -5,6 +5,7 @@ import src.entity.User;
 import src.manager.RecipeManager;
 import src.screen.MainScreen;
 import src.screen.recipe.ImagePanel;
+import src.screen.utils.IconHelper;
 import src.screen.utils.ScreenHelper;
 
 import javax.swing.*;
@@ -64,8 +65,9 @@ public class HomeScreen extends JPanel {
     }
 
     private JPanel infoPanel() {
-        JLabel fridgeBtn = new JLabel("🧊");
-        ImageIcon icon = new ImageIcon("src/fridge.png");
+        JLabel fridgeBtn = new JLabel("");
+//        ImageIcon icon = new ImageIcon("resources/icons/fridge.png");
+        ImageIcon icon = IconHelper.getFridge();
         if (icon.getIconWidth() > 0) {
             Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             fridgeBtn.setIcon(new ImageIcon(img));
@@ -108,23 +110,7 @@ public class HomeScreen extends JPanel {
         contentPanel.setOpaque(false);
 
         // 아이콘 설정
-        ImageIcon icon = null;
-        try {
-            java.net.URL imgURL = getClass().getResource("/src/fridge(icon).png");
-            if (imgURL == null) imgURL = getClass().getResource("/fridge(icon).png");
-            if (imgURL == null) {
-                ImageIcon temp = new ImageIcon("src/fridge(icon).png");
-                if(temp.getIconWidth() > 0) icon = temp;
-            } else {
-                icon = new ImageIcon(imgURL);
-            }
-
-            if (icon != null) {
-                Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-                icon = new ImageIcon(img);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-
+        ImageIcon icon = IconHelper.getFridge();
         JLabel iconLabel = new JLabel();
         if (icon != null) iconLabel.setIcon(icon);
         iconLabel.setVerticalAlignment(SwingConstants.TOP);
@@ -239,21 +225,24 @@ public class HomeScreen extends JPanel {
             imgComp = noImg;
         }
 
-        JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 6));
+        JPanel textPanel = new JPanel(new GridLayout(0, 1, 0, 2));
         textPanel.setOpaque(false);
 
         textPanel.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
 
         String catName = (recipe.getCategory() != null) ? recipe.getCategory().getDisplayName() : "기타";
-        JLabel nameLabel = new JLabel("<html><b>[" + catName + "]</b><br>" + recipe.getName() + "</html>");
+        JLabel catNameLabel = new JLabel("<html><b>[" + catName + "]</b></html>");
+        JLabel nameLabel = new JLabel( "<html><b>" + recipe.getName() + "</b></html>");
+        catNameLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         nameLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
 
         String infoText = recipe.getAmount() + " | " + recipe.getTime();
         JLabel infoLabel = new JLabel(infoText);
         infoLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         infoLabel.setForeground(Color.GRAY);
-        infoLabel.setVerticalAlignment(SwingConstants.TOP);
+        infoLabel.setVerticalAlignment(SwingConstants.CENTER);
 
+        textPanel.add(catNameLabel);
         textPanel.add(nameLabel);
         textPanel.add(infoLabel);
 
