@@ -130,7 +130,7 @@ public class PlannerScreen extends JPanel {
         // 하단 레시피 표시 패널
         JPanel recipePanel = new JPanel();
         recipePanel.setLayout(new BorderLayout());
-        recipePanel.setPreferredSize(new Dimension(360, 180));
+        recipePanel.setPreferredSize(new Dimension(360, 280));
 
         recipePanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(
@@ -173,9 +173,9 @@ public class PlannerScreen extends JPanel {
         table = new JTable(model);
         setupTableInteraction();
         table.setRowHeight(40);
-        for (int i = 0; i < rows.length; i++) {
+        /*for (int i = 0; i < rows.length; i++) {
             model.setValueAt(rows[i], i, 0);
-        }
+        }*/
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED); // 가로 스크롤 활성화
@@ -242,14 +242,14 @@ public class PlannerScreen extends JPanel {
                 int row = table.rowAtPoint(e.getPoint());
                 int col = table.columnAtPoint(e.getPoint());
 
-                if (col <= 0) return; // 잘못된 영역 클릭 방지
+                if (col < 0) return; // 잘못된 영역 클릭 방지
 
                 // 좌클릭 → 레시피 조회
                 if (SwingUtilities.isLeftMouseButton(e)) {
                     String recipe = (String) table.getValueAt(row, col); // 셀에서 레시피 정보 가져오기, 나중에 셀에 넣을때 레시피 정보 같이 넣어야함
                     if (recipe != null && !recipe.isEmpty()) {
                         // 레시피 제목 업데이트
-                        String mealType = (String) table.getValueAt(row, 0);
+                        String[] mealType = {"아침", "점심", "저녁"};
                         String dayHeader = table.getColumnName(col);
                         recipeTitleLabel.setText(dayHeader + " - " + mealType);
 
