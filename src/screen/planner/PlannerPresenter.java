@@ -1,4 +1,4 @@
-package screen.planner;
+package src.screen.planner;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

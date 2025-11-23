@@ -1,6 +1,6 @@
-package screen.recipe;
+package src.screen.recipe;
 
-import entity.Recipe;
+import src.entity.Recipe;
 
 import java.util.List;
 

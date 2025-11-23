@@ -1,11 +1,11 @@
-package screen.home;
+package src.screen.home;
 
-import entity.Recipe;
-import entity.User;
-import manager.RecipeManager;
-import screen.MainScreen;
-import screen.recipe.ImagePanel;
-import screen.utils.ScreenHelper;
+import src.entity.Recipe;
+import src.entity.User;
+import src.manager.RecipeManager;
+import src.screen.MainScreen;
+import src.screen.recipe.ImagePanel;
+import src.screen.utils.ScreenHelper;
 
 import javax.swing.*;
 import java.awt.*;

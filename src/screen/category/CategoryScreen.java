@@ -1,10 +1,10 @@
-package screen.category;
+package src.screen.category;
 
-import entity.FoodCategory;
-import entity.Recipe;
-import manager.RecipeManager;
-import screen.MainScreen;
-import screen.recipe.ImagePanel;
+import src.entity.FoodCategory;
+import src.entity.Recipe;
+import src.manager.RecipeManager;
+import src.screen.MainScreen;
+import src.screen.recipe.ImagePanel;
 
 import javax.swing.*;
 import java.awt.*;

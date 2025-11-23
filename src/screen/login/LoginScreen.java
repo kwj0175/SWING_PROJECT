@@ -1,9 +1,9 @@
-package screen.login;
+package src.screen.login;
 
-import entity.User;
-import manager.UserManager;
-import screen.MainScreen;
-import screen.utils.ScreenHelper;
+import src.entity.User;
+import src.manager.UserManager;
+import src.screen.MainScreen;
+import src.screen.utils.ScreenHelper;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,4 +1,4 @@
-package screen.recipe;
+package src.screen.recipe;
 
 import javax.swing.*;
 import java.awt.*;

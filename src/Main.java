@@ -1,5 +1,5 @@
-import screen.MainScreen;
-import theme.ThemeColor;
+import src.screen.MainScreen;
+import src.theme.ThemeColor;
 
 import javax.swing.*;
 

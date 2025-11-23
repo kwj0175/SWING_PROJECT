@@ -1,13 +1,13 @@
-package screen.recipe;
+package src.screen.recipe;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-import entity.Recipe;
-import screen.MainScreen;
-import screen.utils.ScreenHelper;
-import screen.utils.VerticalScrollPanel;
+import src.entity.Recipe;
+import src.screen.MainScreen;
+import src.screen.utils.ScreenHelper;
+import src.screen.utils.VerticalScrollPanel;
 
 public class RecipeScreen extends JPanel {
     private final RecipePresenter recipePresenter;
