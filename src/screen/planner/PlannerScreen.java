@@ -1,6 +1,6 @@
-package src.screen.planner;
+package screen.planner;
 
-import src.screen.MainScreen;
+import screen.MainScreen;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

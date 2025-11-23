@@ -1,8 +1,8 @@
-package src.screen.category;
+package screen.category;
 
-import src.entity.FoodCategory;
-import src.entity.Recipe;
-import src.manager.RecipeManager;
+import entity.FoodCategory;
+import entity.Recipe;
+import manager.RecipeManager;
 
 import java.util.List;
 

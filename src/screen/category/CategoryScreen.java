@@ -1,10 +1,10 @@
-package src.screen.category;
+package screen.category;
 
-import src.entity.FoodCategory;
-import src.entity.Recipe;
-import src.manager.RecipeManager;
-import src.screen.MainScreen;
-import src.screen.recipe.ImagePanel;
+import entity.FoodCategory;
+import entity.Recipe;
+import manager.RecipeManager;
+import screen.MainScreen;
+import screen.recipe.ImagePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,8 +29,10 @@ public class CategoryScreen extends JPanel {
     private void initComponents() {
         // 상단바
         JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 5));
         inputField = new JTextField();
-        JButton searchButton = new JButton("검색");
+        JButton searchButton = new JButton("검색");//검색버튼
+        // searchButton.setBackground(new Color(143, 202, 202)); //연한 청록색
 
         ActionListener searchAction = e -> searchCurrentCard(inputField.getText().trim());
         inputField.addActionListener(searchAction);
@@ -38,20 +40,31 @@ public class CategoryScreen extends JPanel {
 
         topPanel.add(inputField, BorderLayout.CENTER);
         topPanel.add(searchButton, BorderLayout.EAST);
-        add(topPanel, BorderLayout.NORTH);
 
         // 카테고리 버튼
         JPanel categoryPanel = new JPanel(
                 new GridLayout(1, FoodCategory.values().length, 5, 5)
         );
 
-        for(FoodCategory cat : FoodCategory.values()) {
+        for(FoodCategory cat : FoodCategory.values()) {//카테고리 버튼 생성
             JButton btn = new JButton(cat.getDisplayName());
             btn.setFont(new Font("SansSerif", Font.BOLD, 12));
+            // btn.setBackground(new Color(200, 230, 201)); //연한 초록
+            
             categoryPanel.add(btn);
             btn.addActionListener(e -> cardLayout.show(cards, cat.name()));
         }
-        add(categoryPanel, BorderLayout.AFTER_LAST_LINE);
+
+        JPanel headerPanel = new JPanel();
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        topPanel.setAlignmentX(Component.LEFT_ALIGNMENT);//왼쪽 정렬
+        headerPanel.add(topPanel);
+
+        categoryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        headerPanel.add(categoryPanel);
+        headerPanel.add(Box.createVerticalStrut(2));//간격 띄우기
+
+        add(headerPanel, BorderLayout.NORTH);
 
         // 중앙 카드 영역
         cardLayout = new CardLayout();
@@ -73,11 +86,12 @@ public class CategoryScreen extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         panel.setBackground(Color.WHITE);
 
+        // 메뉴 카드 생성
         for(Recipe recipe : recipes) {
             JPanel menuPanel = new JPanel(new BorderLayout());
             menuPanel.setBackground(Color.WHITE);
             menuPanel.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
-            menuPanel.setPreferredSize(new Dimension(160, 160));
+            menuPanel.setPreferredSize(new Dimension(150, 160));
 
             String path = recipe.getImagePath();
             Component imgComp;
@@ -93,19 +107,20 @@ public class CategoryScreen extends JPanel {
                 imgComp = noImg;
             }
 
-            JLabel label = new JLabel(recipe.getTitle());
+            JLabel label = new JLabel(recipe.getName());//메뉴 이름 라벨
             label.setFont(new Font("맑은 고딕", Font.BOLD, 13));
             label.setHorizontalAlignment(SwingConstants.CENTER);
             label.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
             label.setOpaque(true);
             label.setBackground(Color.WHITE);
+            // label.setBackground(new Color(204, 226, 203));//Color.WHITE -> 연한 초록으로 변경
 
             menuPanel.add(imgComp, BorderLayout.CENTER);
             menuPanel.add(label, BorderLayout.SOUTH);
 
             menuPanel.addMouseListener(new MouseAdapter() {
                 public void mouseEntered(MouseEvent e) {
-                    menuPanel.setBorder(BorderFactory.createLineBorder(new Color(100, 150, 255), 2));
+                    menuPanel.setBorder(BorderFactory.createLineBorder(new Color(100, 150, 255), 2));//
                     menuPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 }
                 public void mouseExited(MouseEvent e) {
@@ -126,6 +141,7 @@ public class CategoryScreen extends JPanel {
         JScrollPane scrollPane = new JScrollPane(wrapper);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         return scrollPane;
     }
 
