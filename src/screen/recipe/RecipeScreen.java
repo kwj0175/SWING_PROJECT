@@ -3,6 +3,9 @@ package src.screen.recipe;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import javax.swing.plaf.basic.BasicScrollBarUI;
+import javax.swing.SwingUtilities;
+import java.awt.Insets;
 
 import src.entity.Recipe;
 import src.screen.MainScreen;
@@ -18,6 +21,7 @@ public class RecipeScreen extends JPanel {
     private JLabel timeLabel;
     private JPanel detailsPanel;
     private JPanel stepsPanel;
+    private JScrollPane scrollPane; 
 
     public RecipeScreen(MainScreen mainScreen) {
         this.recipePresenter = new RecipePresenter(this);
@@ -51,6 +55,7 @@ public class RecipeScreen extends JPanel {
         timeLabel = ScreenHelper.setText("", 16);
 
         JPanel amountTimePanel = ScreenHelper.darkCardPanel();
+        amountTimePanel.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
         GroupLayout formLayout = ScreenHelper.groupLayout(amountTimePanel);
 
         int HORIZONTAL_GAP = 15;
@@ -79,13 +84,32 @@ public class RecipeScreen extends JPanel {
     private void buildStepsPanel() {
         stepsPanel = new JPanel(new GridLayout(0, 1, 8, 8));
         stepsPanel.setOpaque(false);
+        stepsPanel.setLayout(new BoxLayout(stepsPanel, BoxLayout.Y_AXIS));
+    }
+    
+    private JComponent createMultiLineText(String text) {
+        JTextArea area = new JTextArea(text);
+        area.setLineWrap(true);          
+        area.setWrapStyleWord(true);    
+        area.setEditable(false);        
+        area.setOpaque(false);         
+        area.setBorder(null);          
+        
+        area.setMargin(new Insets(0, 0, 0, 0));
+
+       
+        JLabel tmp = ScreenHelper.setText("");
+        area.setFont(tmp.getFont());
+
+        return area;
     }
 
     private JPanel buildForm() {
         JPanel root = ScreenHelper.darkCardPanel();
-        root.setBorder(BorderFactory.createEmptyBorder(30, 30, 10, 10));
-        root.setLayout(new BorderLayout(0, 15));
+        root.setBorder(BorderFactory.createEmptyBorder(30, 20, 10, 20));
+        root.setLayout(new BorderLayout());
 
+        
         JPanel header = new JPanel();
         header.setOpaque(false);
         GroupLayout headerLayout = ScreenHelper.groupLayout(header);
@@ -106,22 +130,27 @@ public class RecipeScreen extends JPanel {
                         .addComponent(namePanel)
                         .addGap(15)
                         .addComponent(imgPanel)
-                        .addGap(15)
+                        .addGap(5)
                         .addComponent(amountTimePanel)
         );
 
+        
         buildDetailsPanel();
         buildStepsPanel();
 
-        JPanel body = new VerticalScrollPanel();
-        body.setOpaque(false);
-        body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
+        
+        JPanel content = new VerticalScrollPanel(); 
+        content.setOpaque(false);
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
-        body.add(detailsPanel);
-        body.add(Box.createVerticalStrut(20));
-        body.add(stepsPanel);
+        content.add(header);
+        content.add(Box.createVerticalStrut(15));  
+        content.add(detailsPanel);
+        content.add(Box.createVerticalStrut(8));   
+        content.add(stepsPanel);
 
-        JScrollPane scrollPane = new JScrollPane(body);
+        
+        scrollPane = new JScrollPane(content);
         scrollPane.setBorder(null);
         scrollPane.setOpaque(false);
 
@@ -131,11 +160,46 @@ public class RecipeScreen extends JPanel {
 
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        root.add(header, BorderLayout.NORTH);
+       
+        JScrollBar vBar = scrollPane.getVerticalScrollBar();
+        vBar.setOpaque(false);
+        vBar.setUnitIncrement(16);
+        vBar.setPreferredSize(new Dimension(8, 0));
+        
+        vBar.setPreferredSize(new Dimension(0, 0));
+
+        vBar.setUI(new BasicScrollBarUI() {
+            @Override
+            protected void configureScrollBarColors() {
+                this.thumbColor = new Color(255, 255, 255, 80);
+                this.trackColor = new Color(0, 0, 0, 0);
+            }
+
+            @Override
+            protected JButton createDecreaseButton(int orientation) {
+                return createZeroButton();
+            }
+
+            @Override
+            protected JButton createIncreaseButton(int orientation) {
+                return createZeroButton();
+            }
+
+            private JButton createZeroButton() {
+                JButton button = new JButton();
+                button.setPreferredSize(new Dimension(0, 0));
+                button.setMinimumSize(new Dimension(0, 0));
+                button.setMaximumSize(new Dimension(0, 0));
+                return button;
+            }
+        });
+
+       
         root.add(scrollPane, BorderLayout.CENTER);
 
         return root;
     }
+  
 
     public void setRecipe(Recipe recipe) {
         recipePresenter.showRecipe(recipe);
@@ -170,12 +234,45 @@ public class RecipeScreen extends JPanel {
 
         stepsPanel.removeAll();
         if (steps != null) {
-            for (String data : steps) {
-                stepsPanel.add(ScreenHelper.setText(data));
+        	int index = 1;
+        	boolean first = true;
+
+            for (String raw : steps) {
+                if (raw == null) continue;
+
+                
+                String[] parts = raw.split("/");
+
+                for (String part : parts) {
+                	if (part == null) continue;
+                    
+                    String cleaned = part.stripLeading();
+
+                    if (cleaned.isEmpty()) continue;
+
+                    String numbered = index + ". " + cleaned;   
+                    JComponent comp = createMultiLineText(numbered);
+                    
+                    
+                    
+                    if (!first) {
+                        stepsPanel.add(Box.createVerticalStrut(4)); 
+                    }
+                    stepsPanel.add(comp);
+                    first = false;
+                    index++;
             }
         }
         stepsPanel.revalidate();
         stepsPanel.repaint();
+        
+        SwingUtilities.invokeLater(() -> {
+            if (scrollPane != null) {
+                scrollPane.getVerticalScrollBar().setValue(0);
+            }
+        });
+        
     }
 
+}
 }
