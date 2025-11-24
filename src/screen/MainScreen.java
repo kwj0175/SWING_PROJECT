@@ -15,6 +15,7 @@ import src.screen.navigation.BottomNavigation;
 import src.screen.navigation.NavigationHandler;
 import src.screen.planner.PlannerScreen;
 import src.screen.recipe.RecipeScreen;
+import src.theme.ThemeColor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -98,5 +99,13 @@ public class MainScreen extends JFrame implements NavigationHandler {
     public void displayRecipeDetail(Recipe recipe) {
         recipeScreen.setRecipe(recipe);
         cardLayout.show(cardPanel, "Recipe");
+    }
+
+    public static void main(String[] args) {
+        ThemeColor.applyThemeDark("theme/dark-ui.properties");
+        SwingUtilities.invokeLater(() -> {
+            MainScreen mainScreen = new MainScreen();
+            mainScreen.run();
+        });
     }
 }
