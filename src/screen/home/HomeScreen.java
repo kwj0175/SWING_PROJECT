@@ -124,9 +124,8 @@ public class HomeScreen extends JPanel {
 
         JTextField inputField = new JTextField();
         //입력 창 크기
-        inputField.setPreferredSize(new Dimension(220, 30)); // 너비 220, 높이 30
+        inputField.setPreferredSize(new Dimension(220, 30));
 
-        // 입력창이 늘어나지 않게 잡아주는 래퍼 패널
         JPanel inputWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         inputWrapper.setOpaque(false);
         inputWrapper.add(inputField);
@@ -149,7 +148,7 @@ public class HomeScreen extends JPanel {
         rootPanel.add(buttonPanel, BorderLayout.SOUTH);
         dialog.add(rootPanel);
 
-        // 4. 이벤트 처리
+        //이벤트 처리
         java.awt.event.ActionListener action = e -> {
             String input = inputField.getText();
             dialog.dispose();
@@ -200,7 +199,6 @@ public class HomeScreen extends JPanel {
         recommendListPanel.revalidate();
         recommendListPanel.repaint();
     }
-
     private JPanel createRecipeCard(Recipe recipe) {
         JPanel card = new JPanel(new BorderLayout(15, 0));
         card.setBackground(Color.WHITE);
@@ -225,26 +223,35 @@ public class HomeScreen extends JPanel {
             imgComp = noImg;
         }
 
-        JPanel textPanel = new JPanel(new GridLayout(0, 1, 0, 2));
+        JPanel textPanel = new JPanel(new BorderLayout(0, 0));
         textPanel.setOpaque(false);
-
         textPanel.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
 
         String catName = (recipe.getCategory() != null) ? recipe.getCategory().getDisplayName() : "기타";
-        JLabel catNameLabel = new JLabel("<html><b>[" + catName + "]</b></html>");
-        JLabel nameLabel = new JLabel( "<html><b>" + recipe.getName() + "</b></html>");
-        catNameLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        nameLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        JLabel catLabel = new JLabel("[" + catName + "]");
+        catLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        catLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+        textPanel.add(catLabel, BorderLayout.NORTH);
+
+        //제목 길이가 긴 경우 크기 줄임.
+        String name = recipe.getName();
+        int fontSize = 14;
+
+        if (name.length() >= 10) {
+            fontSize = 13;
+        }
+
+        JLabel nameLabel = new JLabel("<html>" + name + "</html>");
+        nameLabel.setFont(new Font("SansSerif", Font.PLAIN, fontSize));
+        nameLabel.setVerticalAlignment(SwingConstants.CENTER);
+        textPanel.add(nameLabel, BorderLayout.CENTER);
 
         String infoText = recipe.getAmount() + " | " + recipe.getTime();
         JLabel infoLabel = new JLabel(infoText);
-        infoLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        infoLabel.setFont(new Font("SansSerif", Font.PLAIN, 11));
         infoLabel.setForeground(Color.GRAY);
-        infoLabel.setVerticalAlignment(SwingConstants.CENTER);
-
-        textPanel.add(catNameLabel);
-        textPanel.add(nameLabel);
-        textPanel.add(infoLabel);
+        infoLabel.setVerticalAlignment(SwingConstants.TOP);
+        textPanel.add(infoLabel, BorderLayout.SOUTH);
 
         card.add(imgComp, BorderLayout.WEST);
         card.add(textPanel, BorderLayout.CENTER);
