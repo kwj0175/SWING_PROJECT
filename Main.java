@@ -1,5 +1,3 @@
-package src;
-
 import src.screen.MainScreen;
 import src.theme.ThemeColor;
 
