@@ -1,10 +1,10 @@
 package src.screen.recipe;
 
-import entity.Recipe;
-import screen.MainScreen;
-import screen.utils.IconHelper;
-import screen.utils.ScreenHelper;
-import screen.utils.VerticalScrollPanel;
+import src.entity.Recipe;
+import src.screen.MainScreen;
+import src.screen.utils.IconHelper;
+import src.screen.utils.ScreenHelper;
+import src.screen.utils.VerticalScrollPanel;
 
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicScrollBarUI;
@@ -24,10 +24,6 @@ public class RecipeScreen extends JPanel {
     private JPanel stepsPanel;
     private JScrollPane scrollPane;
 
-    // 제목 왼쪽 즐겨찾기 / 화면 오른쪽 상단 추가 버튼
-    private JToggleButton favoriteButton;
-    private JButton addRecipeButton;
-
     public RecipeScreen(MainScreen mainScreen) {
         this.mainScreen = mainScreen;
         this.recipePresenter = new RecipePresenter(this);
@@ -36,37 +32,28 @@ public class RecipeScreen extends JPanel {
         setLayout(new BorderLayout());
 
         JPanel form = buildForm();
-        JPanel topBar = buildTopBar();   // 화면 오른쪽 상단 추가 버튼
-
-        add(topBar, BorderLayout.NORTH);
         add(form, BorderLayout.CENTER);
     }
 
     /* ---------- 상단 오른쪽 추가 버튼 ---------- */
 
-    private JPanel buildTopBar() {
-        addRecipeButton = new JButton();
-        ImageIcon addIcon = IconHelper.getAddRecipe();
+    private JPanel buildButton(ImageIcon icon) {
+        JButton button = new JButton();
+        ImageIcon addIcon = icon;
         if (addIcon != null) {
-            addRecipeButton.setIcon(addIcon);
-        
+            button.setIcon(addIcon);
         }
-        addRecipeButton.setMargin(new Insets(0, 0, 0, 0));
-        addRecipeButton.setBorderPainted(false);
-        addRecipeButton.setContentAreaFilled(false);
-        addRecipeButton.setFocusPainted(false);
-        addRecipeButton.setPreferredSize(new Dimension(34, 34));
+        button.setMargin(new Insets(0, 0, 0, 0));
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        button.setFocusPainted(false);
+        button.setPreferredSize(new Dimension(30, 30));
 
-        JPanel rightWrap = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        rightWrap.setOpaque(false);
-        rightWrap.add(addRecipeButton);
+        JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        wrapper.setOpaque(false);
+        wrapper.add(button);
 
-        JPanel bar = new JPanel(new BorderLayout());
-        bar.setOpaque(false);
-        bar.setBorder(BorderFactory.createEmptyBorder(5, 0, 0, 10));
-        bar.add(rightWrap, BorderLayout.CENTER);
-
-        return bar;
+        return wrapper;
     }
 
     /* ---------- 제목 / 이미지 / 인분·시간 ---------- */
@@ -75,26 +62,14 @@ public class RecipeScreen extends JPanel {
         nameLabel = ScreenHelper.setText("", 20);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        favoriteButton = new JToggleButton();
-        ImageIcon favIcon = IconHelper.getFavorite();
-        if (favIcon != null) {
-            favoriteButton.setIcon(favIcon);
-        
-        }
-        favoriteButton.setMargin(new Insets(0, 0, 0, 0));
-        favoriteButton.setBorderPainted(false);
-        favoriteButton.setContentAreaFilled(false);
-        favoriteButton.setFocusPainted(false);
-        favoriteButton.setPreferredSize(new Dimension(30, 30));
+        JPanel favoriteBtnWrapper = buildButton(IconHelper.getFavorite());
+        JPanel recipeAddWrapper = buildButton(IconHelper.getAddRecipe());
 
         JPanel namePanel = ScreenHelper.darkCardPanel();
         namePanel.setLayout(new BorderLayout());
 
-        JPanel leftWrapper = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        leftWrapper.setOpaque(false);
-        leftWrapper.add(favoriteButton);
-
-        namePanel.add(leftWrapper, BorderLayout.WEST);
+        namePanel.add(favoriteBtnWrapper, BorderLayout.WEST);
+        namePanel.add(recipeAddWrapper, BorderLayout.EAST);
         namePanel.add(nameLabel, BorderLayout.CENTER);
 
         return namePanel;
@@ -146,6 +121,7 @@ public class RecipeScreen extends JPanel {
         stepsPanel = new JPanel();
         stepsPanel.setOpaque(false);
         stepsPanel.setLayout(new BoxLayout(stepsPanel, BoxLayout.Y_AXIS));
+        stepsPanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
     }
 
     private JComponent createMultiLineText(String text) {
@@ -219,6 +195,13 @@ public class RecipeScreen extends JPanel {
         viewport.setOpaque(true);
         viewport.setBackground(root.getBackground());
 
+        customScrollBar();
+
+        root.add(scrollPane, BorderLayout.CENTER);
+        return root;
+    }
+
+    private void customScrollBar() {
         JScrollBar vBar = scrollPane.getVerticalScrollBar();
         vBar.setOpaque(false);
         vBar.setUnitIncrement(16);
@@ -249,9 +232,6 @@ public class RecipeScreen extends JPanel {
                 return button;
             }
         });
-
-        root.add(scrollPane, BorderLayout.CENTER);
-        return root;
     }
 
     /* ---------- 외부에서 레시피 세팅 ---------- */
@@ -303,32 +283,16 @@ public class RecipeScreen extends JPanel {
         // 조리방법
         stepsPanel.removeAll();
         if (steps != null) {
-            int index = 1;
             boolean first = true;
+            for (String step : steps) {
+                JComponent comp = createMultiLineText(step);
+                comp.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            for (String raw : steps) {
-                if (raw == null) continue;
-
-                String[] parts = raw.split("/");
-
-                for (String part : parts) {
-                    if (part == null) continue;
-
-                    String cleaned = part.stripLeading();
-                    if (cleaned.isEmpty()) continue;
-
-                    String numbered = index + ". " + cleaned;
-                    JComponent comp = createMultiLineText(numbered);
-                    comp.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                    if (!first) {
-                        stepsPanel.add(Box.createVerticalStrut(4));
-                    }
-                    stepsPanel.add(comp);
-
-                    first = false;
-                    index++;
+                if (!first) {
+                    stepsPanel.add(Box.createVerticalStrut(4));
                 }
+                stepsPanel.add(comp);
+                first = false;
             }
         }
         stepsPanel.revalidate();

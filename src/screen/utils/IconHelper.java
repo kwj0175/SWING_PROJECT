@@ -5,7 +5,7 @@ import java.awt.*;
 import java.net.URL;
 
 public class IconHelper {
-    private static final String BASE_PATH = "/icons/";
+    private static final String BASE_PATH = "/resources/icons/";
     private static final String FRIDGE_PNG = "fridge.png";
     private static final String FAVORITE_JPG  = "favorite.jpg";
     private static final String ADDRECIPE_JPG = "addrecipe.jpg";
