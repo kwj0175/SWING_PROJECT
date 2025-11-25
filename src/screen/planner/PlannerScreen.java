@@ -7,9 +7,7 @@ import src.screen.MainScreen;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.awt.event.*;
 
 public class PlannerScreen extends JPanel {
@@ -19,13 +17,14 @@ public class PlannerScreen extends JPanel {
     private JTextArea recipeContentArea;
     private JButton prevWeekBtn;
     private JButton nextWeekBtn;
+    private JPanel recipePanel;
+
+    private final String[] COLUMNS = {"일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"};
+    private final String[] ROWS = {"아침", "점심", "저녁"};
 
     private final PlannerPresenter plannerPresenter;
     private final MainScreen mainScreen;
     private final RecipeManager recipeManager;
-
-    // 주차별로 레시피 저장: "year-month-week" -> cellRecipeMap
-    private final Map<String, Map<String, Recipe>> weeklyRecipeData = new HashMap<>();
 
     // 오버레이 관련
     private PlannerOverlay overlayPanel;
@@ -39,7 +38,6 @@ public class PlannerScreen extends JPanel {
         setLayout(new GridBagLayout());
 
         JPanel form = buildForm();
-        JPanel backBtnPanel = buildBackBtnPanel();
 
         JPanel root = new JPanel();
         GroupLayout layout = new GroupLayout(root);
@@ -51,13 +49,11 @@ public class PlannerScreen extends JPanel {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(backBtnPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(form, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(backBtnPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                         .addComponent(form, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
@@ -76,34 +72,14 @@ public class PlannerScreen extends JPanel {
     }
 
     /**
-     * 현재 주차의 키 생성
-     */
-    private String getCurrentWeekKey() {
-        return plannerPresenter.getCurrentYear() + "-" +
-                plannerPresenter.getCurrentMonth() + "-" +
-                plannerPresenter.getCurrentWeek();
-    }
-
-    /**
-     * 현재 주차의 레시피 데이터 가져오기
-     */
-    private Map<String, Recipe> getCurrentWeekRecipes() {
-        String weekKey = getCurrentWeekKey();
-        return weeklyRecipeData.computeIfAbsent(weekKey, k -> new HashMap<>());
-    }
-
-    /**
      * 주차 변경 시 데이터 로드
      */
     private void loadWeekData() {
-        Map<String, Recipe> currentWeekRecipes = getCurrentWeekRecipes();
-
         // 테이블 초기화
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         for (int row = 0; row < model.getRowCount(); row++) {
             for (int col = 0; col < model.getColumnCount(); col++) {
-                String cellKey = row + "," + col;
-                Recipe recipe = currentWeekRecipes.get(cellKey);
+                Recipe recipe = plannerPresenter.getRecipeAt(row, col);
                 if (recipe != null) {
                     model.setValueAt(recipe.getName(), row, col);
                 } else {
@@ -125,7 +101,7 @@ public class PlannerScreen extends JPanel {
      */
     public void enterRecipeAddMode(Recipe recipe) {
         this.isAddMode = true;
-        hideRecipeDetailPanel();
+        recipeDetailPanelVisibility();
         showRecipeOverlay(recipe);
     }
 
@@ -134,25 +110,25 @@ public class PlannerScreen extends JPanel {
      */
     private void showRecipeOverlay(Recipe recipe) {
         // 기존 오버레이가 있으면 제거
-        if (overlayPanel != null) {
-            remove(overlayPanel);
+        if (overlayPanel == null) {
+            // PlannerOverlay 생성
+            overlayPanel = new PlannerOverlay(recipe, e -> exitRecipeAddMode());
+
+            // 오버레이를 최상단에 추가
+            GridBagConstraints c = new GridBagConstraints();
+            c.gridx = 0;
+            c.gridy = 0;
+            c.weightx = 1.0;
+            c.weighty = 1.0;
+            c.fill = GridBagConstraints.BOTH;
+            add(overlayPanel, c);
+        } else {
+            overlayPanel.setRecipe(recipe);
+            overlayPanel.setVisible(true);
         }
-
-        // PlannerOverlay 생성
-        overlayPanel = new PlannerOverlay(recipe, e -> exitRecipeAddMode());
-
-        // 오버레이를 최상단에 추가
-        GridBagConstraints c = new GridBagConstraints();
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = 1.0;
-        c.weighty = 1.0;
-        c.fill = GridBagConstraints.BOTH;
-        add(overlayPanel, c);
 
         // 화면 최상단으로 이동
         setComponentZOrder(overlayPanel, 0);
-
         revalidate();
         repaint();
     }
@@ -164,11 +140,10 @@ public class PlannerScreen extends JPanel {
         isAddMode = false;
 
         if (overlayPanel != null) {
-            remove(overlayPanel);
-            overlayPanel = null;
+            overlayPanel.setVisible(false);
         }
         // 하단 레시피 상세정보 패널 다시 보이기
-        showRecipeDetailPanel();
+        recipeDetailPanelVisibility();
         revalidate();
         repaint();
     }
@@ -176,55 +151,19 @@ public class PlannerScreen extends JPanel {
     /**
      * 레시피 상세정보 패널 숨기기
      */
-    private void hideRecipeDetailPanel() {
-        for (Component comp : getComponents()) {
-            if (comp instanceof JPanel) {
-                JPanel panel = (JPanel) comp;
-                for (Component child : panel.getComponents()) {
-                    if (child instanceof JPanel) {
-                        JPanel formPanel = (JPanel) child;
-                        Component[] formComponents = formPanel.getComponents();
-                        // 마지막 컴포넌트가 레시피 상세 패널
-                        if (formComponents.length > 0) {
-                            Component lastComp = formComponents[formComponents.length - 1];
-                            lastComp.setVisible(false);
-                        }
-                    }
-                }
-            }
-        }
-    }
+    private void recipeDetailPanelVisibility() {
+        if (recipePanel == null)  return;
 
-    /**
-     * 레시피 상세정보 패널 다시 보이기
-     */
-    private void showRecipeDetailPanel() {
-        for (Component comp : getComponents()) {
-            if (comp instanceof JPanel) {
-                JPanel panel = (JPanel) comp;
-                for (Component child : panel.getComponents()) {
-                    if (child instanceof JPanel) {
-                        JPanel formPanel = (JPanel) child;
-                        Component[] formComponents = formPanel.getComponents();
-                        if (formComponents.length > 0) {
-                            Component lastComp = formComponents[formComponents.length - 1];
-                            lastComp.setVisible(true);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private JPanel buildBackBtnPanel() {
-        JPanel bar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        return bar;
+        boolean visible = !isAddMode;
+        recipePanel.setVisible(visible);
+        recipePanel.revalidate();
+        recipePanel.repaint();
     }
 
     private JPanel buildForm() {
         JPanel topPanel = new JPanel();
         JScrollPane scrollPane = buildTable(topPanel);
-        JPanel recipePanel = buildRecipe();
+        JPanel detailPanel = buildRecipe();
 
         JPanel form = new JPanel();
         GroupLayout formLayout = new GroupLayout(form);
@@ -238,7 +177,7 @@ public class PlannerScreen extends JPanel {
                 formLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(topPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(scrollPane, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(recipePanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(detailPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         formLayout.setVerticalGroup(
@@ -247,7 +186,7 @@ public class PlannerScreen extends JPanel {
                         .addGap(GAP)
                         .addComponent(scrollPane, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(GAP)
-                        .addComponent(recipePanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(detailPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         );
 
         updateTableHeaders();
@@ -255,7 +194,7 @@ public class PlannerScreen extends JPanel {
     }
 
     private JPanel buildRecipe() {
-        JPanel recipePanel = new JPanel();
+        recipePanel = new JPanel();
         recipePanel.setLayout(new BorderLayout());
         recipePanel.setPreferredSize(new Dimension(360, 280));
 
@@ -289,11 +228,8 @@ public class PlannerScreen extends JPanel {
         weekLabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
         buildButtons(topPanel);
 
-        String[] columns = {"일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"};
-        String[] rows = {"아침", "점심", "저녁"};
-
-        DefaultTableModel model = new DefaultTableModel(rows.length, columns.length);
-        model.setColumnIdentifiers(columns);
+        DefaultTableModel model = new DefaultTableModel(ROWS.length, COLUMNS.length);
+        model.setColumnIdentifiers(COLUMNS);
         table = new JTable(model);
         setupTableInteraction();
         table.setRowHeight(40);
@@ -361,9 +297,6 @@ public class PlannerScreen extends JPanel {
 
                 if (col < 0 || row < 0) return;
 
-                String cellKey = row + "," + col;
-                Map<String, Recipe> currentWeekRecipes = getCurrentWeekRecipes();
-
                 // 레시피 추가 모드일 때
                 if (isAddMode && overlayPanel != null) {
                     if (SwingUtilities.isLeftMouseButton(e)) {
@@ -374,7 +307,7 @@ public class PlannerScreen extends JPanel {
                     }
                 }
 
-                Recipe existingRecipe = currentWeekRecipes.get(cellKey);
+                Recipe existingRecipe = plannerPresenter.getRecipeAt(row, col);
 
                 // 일반 모드 - 좌클릭
                 if (SwingUtilities.isLeftMouseButton(e)) {
@@ -395,6 +328,7 @@ public class PlannerScreen extends JPanel {
 
                 // 우클릭 → 삭제 메뉴
                 if (SwingUtilities.isRightMouseButton(e)) {
+                    if (isAddMode) return;
                     if (existingRecipe != null) {
                         JPopupMenu popup = new JPopupMenu();
                         JMenuItem deleteItem = new JMenuItem("삭제하기");
@@ -402,7 +336,7 @@ public class PlannerScreen extends JPanel {
 
                         deleteItem.addActionListener(ae -> {
                             table.setValueAt("", row, col);
-                            currentWeekRecipes.remove(cellKey);
+                            plannerPresenter.removeRecipeAt(row, col);
                             recipeTitleLabel.setText("레시피를 선택하세요");
                             recipeContentArea.setText("표의 셀을 클릭하면 레시피 정보가 여기에 표시됩니다.");
                         });
@@ -534,12 +468,8 @@ public class PlannerScreen extends JPanel {
     }
 
     private void addRecipeToCell(int row, int col, Recipe recipe) {
-        String cellKey = row + "," + col;
-        Map<String, Recipe> currentWeekRecipes = getCurrentWeekRecipes();
-        currentWeekRecipes.put(cellKey, recipe);
-
+        plannerPresenter.setRecipeAt(row, col, recipe);
         table.setValueAt(recipe.getName(), row, col);
-
         // 추가 후 바로 하단 패널에 정보 표시
         displayRecipeInfo(row, col, recipe);
     }
