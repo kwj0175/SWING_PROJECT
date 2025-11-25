@@ -1,6 +1,6 @@
-package src.repository;
+package repository;
 
-import src.entity.Recipe;
+import entity.Recipe;
 
 import java.util.List;
 

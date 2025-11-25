@@ -1,15 +1,16 @@
-package src.screen.category;
+package screen.category;
 
-import src.entity.FoodCategory;
-import src.entity.Recipe;
-import src.manager.RecipeManager;
-import src.screen.MainScreen;
-import src.screen.recipe.ImagePanel;
+import entity.FoodCategory;
+import entity.Recipe;
+import manager.RecipeManager;
+import screen.MainScreen;
+import screen.recipe.ImagePanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
+// import java.util.Locale.Category;
 
 public class CategoryScreen extends JPanel {
     private JTextField inputField;
@@ -52,7 +53,12 @@ public class CategoryScreen extends JPanel {
             // btn.setBackground(new Color(200, 230, 201)); //연한 초록
             
             categoryPanel.add(btn);
-            btn.addActionListener(e -> cardLayout.show(cards, cat.name()));
+            btn.addActionListener(e -> {
+                cardLayout.show(cards, cat.name());
+                inputField.setText("");
+                searchCurrentCard("");
+            });
+            
         }
 
         JPanel headerPanel = new JPanel();
@@ -71,7 +77,10 @@ public class CategoryScreen extends JPanel {
         cards = new JPanel(cardLayout);
 
         for (FoodCategory cat : FoodCategory.values()) {
-            cards.add(createScrollPanel(getRecipesByCategory(cat)), cat.name());
+            // cards.add(createScrollPanel(getRecipesByCategory(cat)), cat.name());
+            JScrollPane scrollPanel = createScrollPanel(getRecipesByCategory(cat));
+            scrollPanel.setName(cat.name());
+            cards.add(scrollPanel, cat.name());
         }
 
         add(cards, BorderLayout.CENTER);
@@ -146,26 +155,50 @@ public class CategoryScreen extends JPanel {
     }
 
     private void searchCurrentCard(String text) {
+        String cardName = getCurrentCardName();
         Component current = getCurrentCard();
-        if(current instanceof JScrollPane) {
-            JScrollPane sp = (JScrollPane) current;
-            JPanel wrapper = (JPanel) sp.getViewport().getView();
-            JPanel gridPanel = (JPanel) wrapper.getComponent(0);
 
-            for(Component comp : gridPanel.getComponents()) {
-                if(comp instanceof JPanel) {
-                    JPanel card = (JPanel) comp;
-                    Component southComp = ((BorderLayout)card.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
+        if(cardName == null || !(current instanceof JScrollPane)) return;
 
-                    if(southComp instanceof JLabel) {
-                        String title = ((JLabel) southComp).getText();
-                        comp.setVisible(title.contains(text));
-                    }
-                }
-            }
-            gridPanel.revalidate();
-            gridPanel.repaint();
+        FoodCategory currentCategory;
+        try{
+            currentCategory = FoodCategory.valueOf(cardName);
+        } catch(IllegalArgumentException e){
+            System.err.println("Invalid card name: " + cardName);
+            return;
         }
+
+        List<Recipe> allRecipes = categoryPresenter.loadRecipesByCategory(currentCategory);
+        List<Recipe> filteredRecipes = categoryPresenter.filterRecipes(allRecipes, text);
+
+        JScrollPane newScrollPane = createScrollPanel(filteredRecipes);
+        newScrollPane.setName(cardName);
+
+        cards.remove(current);
+        cards.add(newScrollPane, cardName);
+
+        cardLayout.show(cards, cardName);
+        cards.revalidate();
+        cards.repaint();
+        // if(current instanceof JScrollPane) {
+        //     JScrollPane sp = (JScrollPane) current;
+        //     JPanel wrapper = (JPanel) sp.getViewport().getView();
+        //     JPanel gridPanel = (JPanel) wrapper.getComponent(0);
+
+        //     for(Component comp : gridPanel.getComponents()) {
+        //         if(comp instanceof JPanel) {
+        //             JPanel card = (JPanel) comp;
+        //             Component southComp = ((BorderLayout)card.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
+
+        //             if(southComp instanceof JLabel) {
+        //                 String title = ((JLabel) southComp).getText();
+        //                 comp.setVisible(title.contains(text));
+        //             }
+        //         }
+        //     }
+        //     gridPanel.revalidate();
+        //     gridPanel.repaint();
+        // }
     }
 
     private Component getCurrentCard() {
@@ -173,5 +206,18 @@ public class CategoryScreen extends JPanel {
             if(comp.isVisible()) return comp;
         }
         return null;
+    }
+
+    private String getCurrentCardName(){
+        Component current = getCurrentCard();
+        if(current == null) return null;
+
+        return current.getName();
+        // for(FoodCategory cat : FoodCategory.values()){
+        //     if(cards.getComponent(cards.getComponentZOrder(current)).getName().equals(cat.name())){
+        //         return cat.name();
+        //     }
+        // }
+        // return null;
     }
 }
