@@ -31,7 +31,7 @@ public class PlannerPresenter {
 
     /** 화면에 표시할 주차 텍스트 */
     public String getWeekText() {
-        return currentYear + "년 " + currentMonth + "월 " + currentWeek + "주차";
+        return currentYear + "년 " + currentMonth + "월 ";// + currentWeek + "주차";
     }
 
     /** 현재 주의 요일 헤더 (예: "01 (월)" ~ "07 (일)" 이런 식) */
@@ -76,5 +76,17 @@ public class PlannerPresenter {
             }
             currentWeek = 1;
         }
+    }
+
+    public int getCurrentWeek() {
+        return currentWeek;
+    }
+
+    public int getCurrentMonth() {
+        return currentMonth;
+    }
+
+    public int getCurrentYear() {
+        return currentYear;
     }
 }
