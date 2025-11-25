@@ -49,7 +49,11 @@ public class CategoryScreen extends JPanel {
             JButton btn = new JButton(cat.getDisplayName());
             btn.setFont(new Font("SansSerif", Font.BOLD, 12));
             categoryPanel.add(btn);
-            btn.addActionListener(e -> cardLayout.show(cards, cat.name()));
+            btn.addActionListener(e -> {
+                cardLayout.show(cards, cat.name());
+                inputField.setText("");
+                searchCurrentCard("");
+            });
         }
         add(categoryPanel, BorderLayout.AFTER_LAST_LINE);
 
@@ -58,7 +62,10 @@ public class CategoryScreen extends JPanel {
         cards = new JPanel(cardLayout);
 
         for (FoodCategory cat : FoodCategory.values()) {
-            cards.add(createScrollPanel(getRecipesByCategory(cat)), cat.name());
+            // cards.add(createScrollPanel(getRecipesByCategory(cat)), cat.name());
+            JScrollPane scrollPanel = createScrollPanel(getRecipesByCategory(cat));
+            scrollPanel.setName(cat.name());
+            cards.add(scrollPanel, cat.name());
         }
 
         add(cards, BorderLayout.CENTER);
@@ -130,26 +137,56 @@ public class CategoryScreen extends JPanel {
     }
 
     private void searchCurrentCard(String text) {
+        String cardName = getCurrentCardName();
         Component current = getCurrentCard();
-        if(current instanceof JScrollPane) {
-            JScrollPane sp = (JScrollPane) current;
-            JPanel wrapper = (JPanel) sp.getViewport().getView();
-            JPanel gridPanel = (JPanel) wrapper.getComponent(0);
+        if(cardName == null || !(current instanceof JScrollPane)) return;
 
-            for(Component comp : gridPanel.getComponents()) {
-                if(comp instanceof JPanel) {
-                    JPanel card = (JPanel) comp;
-                    Component southComp = ((BorderLayout)card.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
-
-                    if(southComp instanceof JLabel) {
-                        String title = ((JLabel) southComp).getText();
-                        comp.setVisible(title.contains(text));
-                    }
-                }
-            }
-            gridPanel.revalidate();
-            gridPanel.repaint();
+        FoodCategory currentCategory;
+        try{
+            currentCategory = FoodCategory.valueOf(cardName);
+        } catch(IllegalArgumentException e){
+            System.err.println("Invalid card name: " + cardName);
+            return;
         }
+
+        List<Recipe> allRecipes = categoryPresenter.loadRecipesByCategory(currentCategory);
+        List<Recipe> filteredRecipes = categoryPresenter.filterRecipes(allRecipes, text);
+
+        JScrollPane newScrollPane = createScrollPanel(filteredRecipes);
+        newScrollPane.setName(cardName);
+
+        cards.remove(current);
+        cards.add(newScrollPane, cardName);
+
+        cardLayout.show(cards, cardName);
+        cards.revalidate();
+        cards.repaint();
+//        if(current instanceof JScrollPane) {
+//            JScrollPane sp = (JScrollPane) current;
+//            JPanel wrapper = (JPanel) sp.getViewport().getView();
+//            JPanel gridPanel = (JPanel) wrapper.getComponent(0);
+//
+//            for(Component comp : gridPanel.getComponents()) {
+//                if(comp instanceof JPanel) {
+//                    JPanel card = (JPanel) comp;
+//                    Component southComp = ((BorderLayout)card.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
+//
+//                    if(southComp instanceof JLabel) {
+//                        String title = ((JLabel) southComp).getText();
+//                        comp.setVisible(title.contains(text));
+//                    }
+//                }
+//            }
+//            gridPanel.revalidate();
+//            gridPanel.repaint();
+//        }
+    }
+
+    private String getCurrentCardName(){
+        Component current = getCurrentCard();
+        if(current == null) return null;
+
+        return current.getName();
     }
 
     private Component getCurrentCard() {
