@@ -34,7 +34,11 @@ public class ScreenHelper {
     public static JPanel darkCardPanel() {
         JPanel panel = new JPanel();
         panel.setOpaque(true);
-        panel.setBackground(Color.DARK_GRAY);
+        panel.setBackground(Color.decode("#CCE2CB"));
+//        BorderFactory.createCompoundBorder(
+//                BorderFactory.createLineBorder(new Color(0x97C1A9), 1, true),
+//                BorderFactory.createEmptyBorder(16, 20, 16, 20)
+//        );
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
         return panel;
     }
@@ -42,6 +46,11 @@ public class ScreenHelper {
     public static JPanel noColorCardPanel() {
         JPanel panel = new JPanel();
         panel.setOpaque(true);
+        panel.setBackground(Color.decode("#F9FFFD"));
+//        BorderFactory.createCompoundBorder(
+//                BorderFactory.createLineBorder(new Color(0x97C1A9), 1, true),
+//                BorderFactory.createEmptyBorder(16, 20, 16, 20)
+//        );
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
         return panel;
     }
