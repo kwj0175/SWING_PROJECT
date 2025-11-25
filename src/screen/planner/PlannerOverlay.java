@@ -8,8 +8,11 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 public class PlannerOverlay extends JPanel {
-    private final Recipe recipe;
+    private Recipe recipe;
     private final ActionListener onCancelListener;
+
+    private JLabel titleLabel;
+    private JPanel imagePanel;
 
     public PlannerOverlay(Recipe recipe, ActionListener onCancelListener) {
         this.recipe = recipe;
@@ -60,19 +63,14 @@ public class PlannerOverlay extends JPanel {
         card.setMaximumSize(new Dimension(340, 240));
 
         // 제목
-        JLabel titleLabel = new JLabel(recipe.getName(), SwingConstants.CENTER);
+        titleLabel = new JLabel("", SwingConstants.CENTER);
         titleLabel.setFont(new Font("맑은 고딕", Font.BOLD, 18));
 
         // 이미지
-        JPanel imagePanel = new JPanel(new BorderLayout());
+        imagePanel = new JPanel(new BorderLayout());
         imagePanel.setPreferredSize(new Dimension(280, 120));
-        if (recipe.getImagePath() != null) {
-            imagePanel.add(new ImagePanel(recipe.getImagePath()));
-        } else {
-            JLabel noImg = new JLabel("🍽️", SwingConstants.CENTER);
-            noImg.setFont(new Font("SansSerif", Font.PLAIN, 60));
-            imagePanel.add(noImg);
-        }
+
+        updateRecipeView();
 
         // 안내 메시지 및 버튼
         JLabel guideLabel = new JLabel("원하는 칸을 클릭하세요", SwingConstants.CENTER);
@@ -96,7 +94,31 @@ public class PlannerOverlay extends JPanel {
         return card;
     }
 
+    private void updateRecipeView() {
+        if (titleLabel != null) {
+            titleLabel.setText(recipe != null ? recipe.getName() : "");
+        }
+
+        if (imagePanel != null) {
+            imagePanel.removeAll();
+            if (recipe.getImagePath() != null) {
+                imagePanel.add(new ImagePanel(recipe.getImagePath()));
+            } else {
+                JLabel noImg = new JLabel("🍽️", SwingConstants.CENTER);
+                noImg.setFont(new Font("SansSerif", Font.PLAIN, 60));
+                imagePanel.add(noImg);
+            }
+            imagePanel.revalidate();
+            imagePanel.repaint();
+        }
+    }
+
     public Recipe getRecipe() {
         return recipe;
+    }
+
+    public void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
+        updateRecipeView();
     }
 }
