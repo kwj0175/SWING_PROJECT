@@ -61,7 +61,7 @@ public class MainScreen extends JFrame implements NavigationHandler {
 
         loginScreen = new LoginScreen(this, userManager);
         homeScreen = new HomeScreen(this, recipeManager);
-        plannerScreen = new PlannerScreen(this);
+        plannerScreen = new PlannerScreen(this, recipeManager);
         categoryScreen = new CategoryScreen(this, recipeManager);
         recipeScreen = new RecipeScreen(this);
     }
@@ -99,4 +99,10 @@ public class MainScreen extends JFrame implements NavigationHandler {
         recipeScreen.setRecipe(recipe);
         cardLayout.show(cardPanel, "Recipe");
     }
+
+    public void displayPlannerScreenWithRecipe(Recipe recipe) {
+        plannerScreen.enterRecipeAddMode(recipe);
+        cardLayout.show(cardPanel, "Planner");
+    }
+
 }
