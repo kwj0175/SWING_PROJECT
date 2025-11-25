@@ -24,6 +24,8 @@ public class RecipeScreen extends JPanel {
     private JPanel stepsPanel;
     private JScrollPane scrollPane;
 
+    private Recipe currentRecipe;
+
     public RecipeScreen(MainScreen mainScreen) {
         this.mainScreen = mainScreen;
         this.recipePresenter = new RecipePresenter(this);
@@ -64,6 +66,16 @@ public class RecipeScreen extends JPanel {
 
         JPanel favoriteBtnWrapper = buildButton(IconHelper.getFavorite());
         JPanel recipeAddWrapper = buildButton(IconHelper.getAddRecipe());
+
+        // 플래너에 추가 버튼 이벤트
+        Component[] components = recipeAddWrapper.getComponents();
+        if (components.length > 0 && components[0] instanceof JButton addBtn) {
+            addBtn.addActionListener(e -> {
+                if (currentRecipe != null) {
+                    mainScreen.displayPlannerScreenWithRecipe(currentRecipe);
+                }
+            });
+        }
 
         JPanel namePanel = ScreenHelper.darkCardPanel();
         namePanel.setLayout(new BorderLayout());
@@ -237,6 +249,7 @@ public class RecipeScreen extends JPanel {
     /* ---------- 외부에서 레시피 세팅 ---------- */
 
     public void setRecipe(Recipe recipe) {
+        this.currentRecipe = recipe;
         recipePresenter.showRecipe(recipe);
 
         // 레시피 바뀔 때마다 맨 위로 스크롤
