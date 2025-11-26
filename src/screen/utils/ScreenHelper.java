@@ -5,6 +5,8 @@ import java.awt.*;
 
 public class ScreenHelper {
 
+    private static final Color borderColor = UIManager.getColor("Panel.borderColor");
+
     private ScreenHelper() {}
 
     public static JLabel setText(String text, int size) {
@@ -31,15 +33,14 @@ public class ScreenHelper {
         return button;
     }
 
-    public static JPanel darkCardPanel() {
+    public static JPanel cardPanel() {
         JPanel panel = new JPanel();
         panel.setOpaque(true);
         panel.setBackground(Color.decode("#CCE2CB"));
-//        BorderFactory.createCompoundBorder(
-//                BorderFactory.createLineBorder(new Color(0x97C1A9), 1, true),
-//                BorderFactory.createEmptyBorder(16, 20, 16, 20)
-//        );
-        panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(borderColor, 3),
+                BorderFactory.createEmptyBorder(16, 20, 16, 20)
+        ));
         return panel;
     }
 

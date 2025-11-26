@@ -9,6 +9,7 @@ import src.repository.FileUserRepository;
 import src.repository.RecipeRepository;
 import src.repository.UserRepository;
 import src.screen.category.CategoryScreen;
+import src.screen.favorite.FavoriteScreen;
 import src.screen.home.HomeScreen;
 import src.screen.login.LoginScreen;
 import src.screen.navigation.BottomNavigation;
@@ -33,6 +34,7 @@ public class MainScreen extends JFrame implements NavigationHandler {
     private final CategoryScreen categoryScreen;
     private final RecipeScreen recipeScreen;
     private final BottomNavigation bottomNavigation;
+    private final FavoriteScreen favoriteScreen;
 
     private final ArrayList<Recipe> recipes = new ArrayList<>();
 
@@ -64,6 +66,7 @@ public class MainScreen extends JFrame implements NavigationHandler {
         plannerScreen = new PlannerScreen(this, recipeManager);
         categoryScreen = new CategoryScreen(this, recipeManager);
         recipeScreen = new RecipeScreen(this);
+        favoriteScreen = new FavoriteScreen(this, recipeManager);
     }
 
     public void run() {
@@ -72,6 +75,7 @@ public class MainScreen extends JFrame implements NavigationHandler {
         cardPanel.add(plannerScreen, "Planner");
         cardPanel.add(categoryScreen, "Category");
         cardPanel.add(recipeScreen, "Recipe");
+        cardPanel.add(favoriteScreen, "Favorite");
 
         cardLayout.show(cardPanel, "Login");
         setVisible(true);
@@ -103,6 +107,10 @@ public class MainScreen extends JFrame implements NavigationHandler {
     public void displayPlannerScreenWithRecipe(Recipe recipe) {
         plannerScreen.enterRecipeAddMode(recipe);
         cardLayout.show(cardPanel, "Planner");
+    }
+
+    public void displayFavoriteScreen() {
+        cardLayout.show(cardPanel, "Favorite");
     }
 
 }

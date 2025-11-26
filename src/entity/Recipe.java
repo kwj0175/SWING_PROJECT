@@ -13,6 +13,7 @@ public class Recipe {
     private final String amount;
     private final String time;
     private final String imagePath;
+    private Boolean favorite;
 
     public Recipe(String name, String title,
                   FoodCategory category, List<String> details,
@@ -26,9 +27,16 @@ public class Recipe {
         this.amount = amount;
         this.time = time;
         this.imagePath = imagePath;
+        this.favorite = false;
     }
 
-    // Getters
+    public void setFavorite(Boolean favorite) {
+        this.favorite = favorite;
+    }
+
+    public Boolean getFavorite() {
+        return favorite;
+    }
 
     public FoodCategory getCategory() { return category; }
     public String getAmount() { return amount; }
