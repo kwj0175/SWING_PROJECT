@@ -65,7 +65,7 @@ public class HomeScreen extends JPanel {
 
     private JPanel createInfoPanel() {
         JLabel fridgeBtn = new JLabel("");
-        ImageIcon icon = IconHelper.getFridge();
+        ImageIcon icon = IconHelper.getFridgeOnIcon();
 
         if (icon != null && icon.getIconWidth() > 0) {
             Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);

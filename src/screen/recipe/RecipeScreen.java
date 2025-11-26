@@ -65,8 +65,8 @@ public class RecipeScreen extends JPanel {
         nameLabel = ScreenHelper.setText("", 20);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        JPanel favoriteBtnWrapper = buildButton(IconHelper.getFavorite());
-        JPanel recipeAddWrapper = buildButton(IconHelper.getAddRecipe());
+        JPanel favoriteBtnWrapper = buildButton(IconHelper.getSFavoriteOnIcon());
+        JPanel recipeAddWrapper = buildButton(IconHelper.getSCalendarOnIcon());
 
         // 플래너에 추가 버튼 이벤트
         Component[] components = recipeAddWrapper.getComponents();

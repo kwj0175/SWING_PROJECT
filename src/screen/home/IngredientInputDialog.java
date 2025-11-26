@@ -33,7 +33,7 @@ public class IngredientInputDialog extends JDialog {
         contentPanel.setOpaque(false);
 
         // 아이콘
-        ImageIcon icon = IconHelper.getFridge();
+        ImageIcon icon = IconHelper.getFridgeOnIcon();
         JLabel iconLabel = new JLabel();
         if (icon != null) iconLabel.setIcon(icon);
         iconLabel.setVerticalAlignment(SwingConstants.TOP);
