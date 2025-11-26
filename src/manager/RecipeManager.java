@@ -24,6 +24,40 @@ public class RecipeManager {
         return Collections.unmodifiableList(recipes);
     }
 
+    public List<Recipe> getFavoriteRecipesByCategory(FoodCategory category) {
+        List<Recipe> catRecipes = recipesByCategory.get(category);
+        if (catRecipes == null || catRecipes.isEmpty()) {
+            return List.of();
+        }
+
+        List<Recipe> favorites = new ArrayList<>();
+        for (Recipe recipe : catRecipes) {
+            if (recipe.getFavorite()) {
+                favorites.add(recipe);
+            }
+        }
+
+        return Collections.unmodifiableList(favorites);
+    }
+
+    public List<Recipe> getFavoriteRecipes() {
+        List<Recipe> favorites = new ArrayList<>();
+
+        for (FoodCategory cat : FoodCategory.values()) {
+            List<Recipe> catRecipes = recipesByCategory.get(cat);
+            if (catRecipes == null || catRecipes.isEmpty()) continue;
+
+            for (Recipe recipe : catRecipes) {
+                if (recipe.getFavorite()) {
+                    favorites.add(recipe);
+                }
+            }
+        }
+
+        return Collections.unmodifiableList(favorites);
+    }
+
+
     public List<Recipe> getRecipesByCategory(FoodCategory category) {
         List<Recipe> list = recipesByCategory.get(category);
         if (list == null) return List.of();

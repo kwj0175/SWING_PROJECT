@@ -65,7 +65,7 @@ public class BottomNavigation extends JPanel{
         homeButton.addActionListener(e -> handler.displayHomeScreen());
         menuButton.addActionListener(e -> handler.displayCategoryScreen());
         plannerButton.addActionListener(e -> handler.displayPlannerScreen());
-        favoriteButton.addActionListener(e -> handler.displayPlannerScreen());
+        favoriteButton.addActionListener(e -> handler.displayFavoriteScreen());
 
         return panel;
     }

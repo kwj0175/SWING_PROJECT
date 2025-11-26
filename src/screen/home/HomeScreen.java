@@ -92,7 +92,7 @@ public class HomeScreen extends JPanel {
 
             @Override
             public void mouseExited(MouseEvent e) {
-                fridgeBtn.setIcon(IconHelper.getFridgeOnIcon());  // 호버 빠지면 원상복구
+                fridgeBtn.setIcon(IconHelper.getFridgeOnIcon());
             }
         });
 
@@ -128,7 +128,6 @@ public class HomeScreen extends JPanel {
             }
         }
 
-        // UI 일관성 유지
         for (int i = recommendListPanel.getComponentCount(); i < 4; i++) {
             JPanel empty = new JPanel();
             empty.setOpaque(false);

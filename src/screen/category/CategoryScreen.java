@@ -17,14 +17,18 @@ public class CategoryScreen extends JPanel {
     private JPanel cards;
     private CardLayout cardLayout;
 
-    private final CategoryPresenter categoryPresenter;
+    protected CategoryPresenter categoryPresenter;
     private final MainScreen mainScreen;
 
     public CategoryScreen(MainScreen mainScreen, RecipeManager recipeManager) {
         setLayout(new BorderLayout());
         this.mainScreen = mainScreen;
-        this.categoryPresenter = new CategoryPresenter(this, recipeManager);
+        this.categoryPresenter = createPresenter(recipeManager);
         initComponents();
+    }
+
+    protected CategoryPresenter createPresenter(RecipeManager recipeManager) {
+        return new CategoryPresenter(this, recipeManager);
     }
 
     private void initComponents() {
