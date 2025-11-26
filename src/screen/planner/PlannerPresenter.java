@@ -1,10 +1,14 @@
 package screen.planner;
 
+import src.entity.Recipe;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.time.temporal.WeekFields;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class PlannerPresenter {
     private int currentWeek;
@@ -12,6 +16,7 @@ public class PlannerPresenter {
     private int currentYear;
 
     private final WeekFields weekFields;
+    private final Map<String, Map<String, Recipe>> weeklyRecipeData = new HashMap<>();
 
     public PlannerPresenter() {
         this(WeekFields.of(Locale.getDefault()));
@@ -31,7 +36,7 @@ public class PlannerPresenter {
 
     /** 화면에 표시할 주차 텍스트 */
     public String getWeekText() {
-        return currentYear + "년 " + currentMonth + "월 " + currentWeek + "주차";
+        return currentYear + "년 " + currentMonth + "월 ";// + currentWeek + "주차";
     }
 
     /** 현재 주의 요일 헤더 (예: "01 (월)" ~ "07 (일)" 이런 식) */
@@ -76,5 +81,35 @@ public class PlannerPresenter {
             }
             currentWeek = 1;
         }
+    }
+
+    private String getCurrentWeekKey() {
+        return currentYear + "-" + currentMonth + "-" + currentWeek;
+    }
+
+    private Map<String, Recipe> getCurrentWeekRecipes() {
+        String weekKey = getCurrentWeekKey();
+        return weeklyRecipeData.computeIfAbsent(weekKey, k -> new HashMap<>());
+    }
+
+    private String toCellKey(int row, int col) {
+        return row + "," + col;
+    }
+
+    public Recipe getRecipeAt(int row, int col) {
+        return getCurrentWeekRecipes().get(toCellKey(row, col));
+    }
+
+    public void setRecipeAt(int row, int col, Recipe recipe) {
+        Map<String, Recipe> currentWeek = getCurrentWeekRecipes();
+        if (recipe == null) {
+            currentWeek.remove(toCellKey(row, col));
+        } else {
+            currentWeek.put(toCellKey(row, col), recipe);
+        }
+    }
+
+    public void removeRecipeAt(int row, int col) {
+        getCurrentWeekRecipes().remove(toCellKey(row, col));
     }
 }

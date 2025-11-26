@@ -1,11 +1,11 @@
 package screen.home;
 
-import entity.Recipe;
-import entity.User;
-import manager.RecipeManager;
-import screen.MainScreen;
-import screen.recipe.ImagePanel;
-import screen.utils.ScreenHelper;
+import src.entity.Recipe;
+import src.entity.User;
+import src.manager.RecipeManager;
+import src.screen.MainScreen;
+import src.screen.utils.IconHelper;
+import src.screen.utils.ScreenHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +32,7 @@ public class HomeScreen extends JPanel {
 
         currentUser = null;
         setOpaque(false);
-        welcomeLabel = ScreenHelper.setText(" ", 18);
+        welcomeLabel = ScreenHelper.setText(" ", 16);
 
         setLayout(new BorderLayout());
 
@@ -51,11 +51,11 @@ public class HomeScreen extends JPanel {
     }
 
     private JPanel buildForm() {
-        JPanel infoPanel = infoPanel();
-        JPanel recommendPanel = recommendPanel();
+        JPanel infoPanel = createInfoPanel();
+        JPanel recommendPanel = createRecommendPanel();
 
         JPanel root = ScreenHelper.noColorCardPanel();
-        root.setLayout(new BorderLayout(0, 15));
+        root.setLayout(new BorderLayout(0, 25));
 
         root.add(infoPanel, BorderLayout.NORTH);
         root.add(recommendPanel, BorderLayout.CENTER);
@@ -63,49 +63,42 @@ public class HomeScreen extends JPanel {
         return root;
     }
 
-    private JPanel infoPanel() {
-        JLabel fridgeBtn = new JLabel("🧊");
-        ImageIcon icon = new ImageIcon("src/fridge.png");
-        if (icon.getIconWidth() > 0) {
+    private JPanel createInfoPanel() {
+        JLabel fridgeBtn = new JLabel("");
+        ImageIcon icon = IconHelper.getFridge();
+
+        if (icon != null && icon.getIconWidth() > 0) {
             Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
             fridgeBtn.setIcon(new ImageIcon(img));
-            fridgeBtn.setText("");
         } else {
+            fridgeBtn.setText("🧊");
             fridgeBtn.setFont(new Font("SansSerif", Font.PLAIN, 40));
         }
 
         fridgeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         fridgeBtn.setToolTipText("냉장고 재료 입력하기");
 
+        // 클릭 시 다이얼로그 호출
         fridgeBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                showIngredientDialog();
+                new IngredientInputDialog(HomeScreen.this, input -> {
+                    homePresenter.onIngredientsSubmitted(input);
+                }).open();
             }
         });
 
         JPanel infoPanel = ScreenHelper.noColorCardPanel();
         infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        infoPanel.setLayout(new BorderLayout(20, 0));
+        infoPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 15, 0));
 
-        infoPanel.add(fridgeBtn, BorderLayout.WEST);
-        infoPanel.add(welcomeLabel, BorderLayout.CENTER);
+        infoPanel.add(fridgeBtn);
+        infoPanel.add(welcomeLabel);
 
         return infoPanel;
     }
 
-    private void showIngredientDialog() {
-        String input = JOptionPane.showInputDialog(this,
-                "냉장고 재료를 입력하세요 (쉼표 구분)\n예: 두부, 계란, 대파",
-                "재료 기반 추천",
-                JOptionPane.QUESTION_MESSAGE);
-
-        if (input != null) {
-            homePresenter.onIngredientsSubmitted(input);
-        }
-    }
-
-    private JPanel recommendPanel() {
+    private JPanel createRecommendPanel() {
         JPanel container = new JPanel(new BorderLayout(0, 5));
         container.setOpaque(false);
         container.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
@@ -126,11 +119,17 @@ public class HomeScreen extends JPanel {
 
     private void updateRecommendList() {
         recommendListPanel.removeAll();
+
         if (recommendedRecipes != null) {
             for (Recipe r : recommendedRecipes) {
-                recommendListPanel.add(createRecipeCard(r));
+                RecipeCardPanel card = new RecipeCardPanel(r, recipe -> {
+                    mainScreen.displayRecipeDetail(recipe);
+                });
+                recommendListPanel.add(card);
             }
         }
+
+        // UI 일관성 유지
         for (int i = recommendListPanel.getComponentCount(); i < 4; i++) {
             JPanel empty = new JPanel();
             empty.setOpaque(false);
@@ -141,62 +140,10 @@ public class HomeScreen extends JPanel {
         recommendListPanel.repaint();
     }
 
-    private JPanel createRecipeCard(Recipe recipe) {
-        JPanel card = new JPanel(new BorderLayout(15, 0));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
-                BorderFactory.createEmptyBorder(5, 10, 5, 10)
-        ));
-        card.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-        Component imgComp;
-        String path = recipe.getImagePath();
-
-        if (path != null) {
-            ImagePanel imgPanel = new ImagePanel(path);
-            imgPanel.setPreferredSize(new Dimension(110, 0));
-            imgComp = imgPanel;
-        } else {
-            JLabel noImg = new JLabel("🍽️");
-            noImg.setFont(new Font("SansSerif", Font.PLAIN, 30));
-            noImg.setHorizontalAlignment(SwingConstants.CENTER);
-            noImg.setPreferredSize(new Dimension(110, 0));
-            imgComp = noImg;
-        }
-
-        JPanel textPanel = new JPanel(new GridLayout(2, 1, 0, 0));
-        textPanel.setOpaque(false);
-
-        String catName = (recipe.getCategory() != null) ? recipe.getCategory().getDisplayName() : "기타";
-        JLabel nameLabel = new JLabel("<html><b>[" + catName + "]</b><br>" + recipe.getName() + "</html>");
-        nameLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
-
-        String infoText = recipe.getAmount() + " | " + recipe.getTime();
-        JLabel infoLabel = new JLabel(infoText);
-        infoLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
-        infoLabel.setForeground(Color.GRAY);
-        infoLabel.setVerticalAlignment(SwingConstants.TOP);
-
-        textPanel.add(nameLabel);
-        textPanel.add(infoLabel);
-
-        card.add(imgComp, BorderLayout.WEST);
-        card.add(textPanel, BorderLayout.CENTER);
-
-        card.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                mainScreen.displayRecipeDetail(recipe);
-            }
-        });
-
-        return card;
-    }
-
     public void setCurrentUser(User user) {
-        currentUser = user;
-        welcomeLabel.setText("<html><b>" + currentUser.getName() + "</b>님,<br>오늘도 맛있는 하루 되세요!</html>");
+        this.currentUser = user;
+        String userName = (currentUser != null) ? currentUser.getName() : "사용자";
+        welcomeLabel.setText("<html><b>" + userName + "</b>님,<br>오늘도 맛있는 하루 되세요!</html>");
         revalidate();
         repaint();
     }
