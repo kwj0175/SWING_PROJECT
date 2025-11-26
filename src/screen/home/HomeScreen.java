@@ -67,26 +67,10 @@ public class HomeScreen extends JPanel {
         JLabel fridgeBtn = new JLabel("");
         ImageIcon icon = IconHelper.getFridgeOnIcon();
 
-        if (icon != null && icon.getIconWidth() > 0) {
-            Image img = icon.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-            fridgeBtn.setIcon(new ImageIcon(img));
-        } else {
-            fridgeBtn.setText("🧊");
-            fridgeBtn.setFont(new Font("SansSerif", Font.PLAIN, 40));
-        }
+        fridgeBtn.setIcon(icon);
 
         fridgeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         fridgeBtn.setToolTipText("냉장고 재료 입력하기");
-
-        // 클릭 시 다이얼로그 호출
-        fridgeBtn.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                new IngredientInputDialog(HomeScreen.this, input -> {
-                    homePresenter.onIngredientsSubmitted(input);
-                }).open();
-            }
-        });
 
         JPanel infoPanel = ScreenHelper.noColorCardPanel();
         infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
@@ -94,6 +78,23 @@ public class HomeScreen extends JPanel {
 
         infoPanel.add(fridgeBtn);
         infoPanel.add(welcomeLabel);
+
+        fridgeBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new IngredientInputDialog(HomeScreen.this, homePresenter::onIngredientsSubmitted).open();
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                fridgeBtn.setIcon(IconHelper.getFridgeOffIcon());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                fridgeBtn.setIcon(IconHelper.getFridgeOnIcon());  // 호버 빠지면 원상복구
+            }
+        });
 
         return infoPanel;
     }
@@ -122,9 +123,7 @@ public class HomeScreen extends JPanel {
 
         if (recommendedRecipes != null) {
             for (Recipe r : recommendedRecipes) {
-                RecipeCardPanel card = new RecipeCardPanel(r, recipe -> {
-                    mainScreen.displayRecipeDetail(recipe);
-                });
+                RecipeCardPanel card = new RecipeCardPanel(r, mainScreen::displayRecipeDetail);
                 recommendListPanel.add(card);
             }
         }

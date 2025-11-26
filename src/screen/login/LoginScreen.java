@@ -7,7 +7,6 @@ import src.screen.utils.ScreenHelper;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LoginScreen extends JPanel {
@@ -65,7 +64,7 @@ public class LoginScreen extends JPanel {
         loginButton = ScreenHelper.primaryButton("로그인", 14);
         signUpButton = ScreenHelper.primaryButton("회원가입", 14);
 
-        JPanel form = ScreenHelper.darkCardPanel();
+        JPanel form = ScreenHelper.cardPanel();
         GroupLayout formLayout = ScreenHelper.groupLayout(form);
 
         int TEXT_FIELD_WIDTH = 180;

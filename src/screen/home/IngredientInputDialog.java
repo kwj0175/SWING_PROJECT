@@ -6,13 +6,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
 
-//재료 입력 팝업창
 public class IngredientInputDialog extends JDialog {
 
-    // 입력 완료 시 호출할 콜백
     public IngredientInputDialog(Component parentComponent, Consumer<String> onConfirmed) {
         super(SwingUtilities.getWindowAncestor(parentComponent), "재료 기반 추천", ModalityType.APPLICATION_MODAL);
-
         setLayout(new BorderLayout());
         setResizable(false);
 
@@ -26,20 +23,16 @@ public class IngredientInputDialog extends JDialog {
     private JPanel buildUI(Consumer<String> onConfirmed) {
         JPanel rootPanel = new JPanel(new BorderLayout(0, 15));
         rootPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        rootPanel.setBackground(Color.WHITE);
 
-        // 콘텐츠 패널
         JPanel contentPanel = new JPanel(new BorderLayout(15, 0));
         contentPanel.setOpaque(false);
 
-        // 아이콘
         ImageIcon icon = IconHelper.getFridgeOnIcon();
         JLabel iconLabel = new JLabel();
         if (icon != null) iconLabel.setIcon(icon);
         iconLabel.setVerticalAlignment(SwingConstants.TOP);
         contentPanel.add(iconLabel, BorderLayout.WEST);
 
-        // 텍스트 + 입력창
         JPanel rightGroupPanel = new JPanel(new BorderLayout(0, 8));
         rightGroupPanel.setOpaque(false);
 
@@ -58,13 +51,11 @@ public class IngredientInputDialog extends JDialog {
 
         contentPanel.add(rightGroupPanel, BorderLayout.CENTER);
 
-        // 버튼 패널
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         buttonPanel.setOpaque(false);
 
         JButton confirmBtn = new JButton("확인");
         confirmBtn.setFocusPainted(false);
-        confirmBtn.setBackground(new Color(240, 240, 240));
         buttonPanel.add(confirmBtn);
 
         rootPanel.add(contentPanel, BorderLayout.CENTER);

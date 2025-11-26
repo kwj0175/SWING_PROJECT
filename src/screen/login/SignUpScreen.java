@@ -86,7 +86,7 @@ public class SignUpScreen extends JDialog {
         int CONTAINER_GAP = 30;
         int ROW_GAP = 20;
 
-        JPanel form = ScreenHelper.darkCardPanel();
+        JPanel form = ScreenHelper.cardPanel();
         GroupLayout formLayout = ScreenHelper.groupLayout(form);
 
         formLayout.setHorizontalGroup(

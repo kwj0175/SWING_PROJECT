@@ -59,7 +59,7 @@ public class IconHelper {
         return loadIcon(BASE_PATH + SEARCH_ON);
     }
 
-    public static ImageIcon getSFridgeOffIcon() {
+    public static ImageIcon getFridgeOffIcon() {
         return loadIcon(BASE_PATH + FRIDGE_OFF);
     }
 

@@ -78,7 +78,7 @@ public class RecipeScreen extends JPanel {
             });
         }
 
-        JPanel namePanel = ScreenHelper.darkCardPanel();
+        JPanel namePanel = ScreenHelper.cardPanel();
         namePanel.setLayout(new BorderLayout());
 
         namePanel.add(favoriteBtnWrapper, BorderLayout.WEST);
@@ -99,7 +99,7 @@ public class RecipeScreen extends JPanel {
         amountLabel = ScreenHelper.setText("", 16);
         timeLabel = ScreenHelper.setText("", 16);
 
-        JPanel amountTimePanel = ScreenHelper.darkCardPanel();
+        JPanel amountTimePanel = ScreenHelper.cardPanel();
         amountTimePanel.setBorder(
                 BorderFactory.createEmptyBorder(4, 10, 4, 10)
         );
@@ -155,7 +155,7 @@ public class RecipeScreen extends JPanel {
     /* ---------- 전체 폼 + 스크롤 ---------- */
 
     private JPanel buildForm() {
-        JPanel root = ScreenHelper.darkCardPanel();
+        JPanel root = ScreenHelper.cardPanel();
         root.setBorder(BorderFactory.createEmptyBorder(30, 20, 10, 20));
         root.setLayout(new BorderLayout());
 

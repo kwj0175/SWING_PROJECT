@@ -8,20 +8,19 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.function.Consumer;
-//레시피 카드 UI
+
 public class RecipeCardPanel extends JPanel {
 
     public RecipeCardPanel(Recipe recipe, Consumer<Recipe> onClickAction) {
         setLayout(new BorderLayout(15, 0));
-//        setBackground(Color.WHITE);
+        Color borderColor = UIManager.getColor("Panel.borderColor");
         setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
+                BorderFactory.createLineBorder(borderColor, 3),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
         setCursor(new Cursor(Cursor.HAND_CURSOR));
 
         add(createImageComponent(recipe.getImagePath()), BorderLayout.WEST);
-
         add(createTextPanel(recipe), BorderLayout.CENTER);
 
         addMouseListener(new MouseAdapter() {
@@ -53,14 +52,12 @@ public class RecipeCardPanel extends JPanel {
         textPanel.setOpaque(false);
         textPanel.setBorder(BorderFactory.createEmptyBorder(3, 0, 3, 0));
 
-        // 상단: 카테고리
         String catName = (recipe.getCategory() != null) ? recipe.getCategory().getDisplayName() : "기타";
         JLabel catLabel = new JLabel("[" + catName + "]");
         catLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         catLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
         textPanel.add(catLabel, BorderLayout.NORTH);
 
-        // 중단: 메뉴 이름
         String name = recipe.getName();
         int fontSize = (name.length() >= 10) ? 13 : 14;
 
