@@ -1,4 +1,4 @@
-package src.screen.recipe;
+package screen.recipe;
 
 import src.entity.Recipe;
 import src.screen.MainScreen;

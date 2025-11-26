@@ -1,4 +1,4 @@
-package src.screen.home;
+package screen.home;
 
 import src.entity.Recipe;
 import src.entity.User;

@@ -1,7 +1,7 @@
-package src.screen.login;
+package screen.login;
 
-import src.entity.User;
-import src.manager.UserManager;
+import entity.User;
+import manager.UserManager;
 
 public class LoginPresenter {
     private final LoginScreen view;

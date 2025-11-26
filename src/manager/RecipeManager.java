@@ -1,8 +1,8 @@
-package src.manager;
+package manager;
 
-import src.entity.FoodCategory;
-import src.entity.Recipe;
-import src.repository.RecipeRepository;
+import entity.FoodCategory;
+import entity.Recipe;
+import repository.RecipeRepository;
 
 import java.util.*;
 
