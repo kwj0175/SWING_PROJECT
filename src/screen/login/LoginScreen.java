@@ -139,6 +139,5 @@ public class LoginScreen extends JPanel {
         );
         mainScreen.displayHomeScreen(loggedInUser);
     }
-
 }
 
