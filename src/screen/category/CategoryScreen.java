@@ -5,12 +5,12 @@ import entity.Recipe;
 import manager.RecipeManager;
 import screen.MainScreen;
 import screen.recipe.ImagePanel;
+import screen.utils.IconHelper;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
-// import java.util.Locale.Category;
 
 public class CategoryScreen extends JPanel {
     private JTextField inputField;
@@ -33,7 +33,6 @@ public class CategoryScreen extends JPanel {
         topPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 5));
         inputField = new JTextField();
         JButton searchButton = new JButton("검색");//검색버튼
-        // searchButton.setBackground(new Color(143, 202, 202)); //연한 청록색
 
         ActionListener searchAction = e -> searchCurrentCard(inputField.getText().trim());
         inputField.addActionListener(searchAction);
@@ -50,7 +49,6 @@ public class CategoryScreen extends JPanel {
         for(FoodCategory cat : FoodCategory.values()) {//카테고리 버튼 생성
             JButton btn = new JButton(cat.getDisplayName());
             btn.setFont(new Font("SansSerif", Font.BOLD, 12));
-            // btn.setBackground(new Color(200, 230, 201)); //연한 초록
             
             categoryPanel.add(btn);
             btn.addActionListener(e -> {
@@ -61,23 +59,24 @@ public class CategoryScreen extends JPanel {
             
         }
 
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+        // 헤더 패널
+        JPanel headerPanel = new JPanel();//
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));//
         topPanel.setAlignmentX(Component.LEFT_ALIGNMENT);//왼쪽 정렬
-        headerPanel.add(topPanel);
+        headerPanel.add(topPanel);//
 
-        categoryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        headerPanel.add(categoryPanel);
+        // 카테고리 패널을 헤더에 추가 --> 카테고리 버튼 화면 위쪽으로 오게 배치
+        categoryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);//
+        headerPanel.add(categoryPanel);//
         headerPanel.add(Box.createVerticalStrut(2));//간격 띄우기
 
-        add(headerPanel, BorderLayout.NORTH);
+        add(headerPanel, BorderLayout.NORTH);//
 
         // 중앙 카드 영역
         cardLayout = new CardLayout();
         cards = new JPanel(cardLayout);
 
         for (FoodCategory cat : FoodCategory.values()) {
-            // cards.add(createScrollPanel(getRecipesByCategory(cat)), cat.name());
             JScrollPane scrollPanel = createScrollPanel(getRecipesByCategory(cat));
             scrollPanel.setName(cat.name());
             cards.add(scrollPanel, cat.name());
@@ -122,7 +121,6 @@ public class CategoryScreen extends JPanel {
             label.setBorder(BorderFactory.createEmptyBorder(8, 0, 8, 0));
             label.setOpaque(true);
             label.setBackground(Color.WHITE);
-            // label.setBackground(new Color(204, 226, 203));//Color.WHITE -> 연한 초록으로 변경
 
             menuPanel.add(imgComp, BorderLayout.CENTER);
             menuPanel.add(label, BorderLayout.SOUTH);
@@ -149,8 +147,8 @@ public class CategoryScreen extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(wrapper);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);//가로 스크롤바 안 보이게 설정
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);//세로 스크롤바 안 보이게 설정//
         return scrollPane;
     }
 
@@ -180,25 +178,6 @@ public class CategoryScreen extends JPanel {
         cardLayout.show(cards, cardName);
         cards.revalidate();
         cards.repaint();
-        // if(current instanceof JScrollPane) {
-        //     JScrollPane sp = (JScrollPane) current;
-        //     JPanel wrapper = (JPanel) sp.getViewport().getView();
-        //     JPanel gridPanel = (JPanel) wrapper.getComponent(0);
-
-        //     for(Component comp : gridPanel.getComponents()) {
-        //         if(comp instanceof JPanel) {
-        //             JPanel card = (JPanel) comp;
-        //             Component southComp = ((BorderLayout)card.getLayout()).getLayoutComponent(BorderLayout.SOUTH);
-
-        //             if(southComp instanceof JLabel) {
-        //                 String title = ((JLabel) southComp).getText();
-        //                 comp.setVisible(title.contains(text));
-        //             }
-        //         }
-        //     }
-        //     gridPanel.revalidate();
-        //     gridPanel.repaint();
-        // }
     }
 
     private Component getCurrentCard() {
@@ -213,11 +192,5 @@ public class CategoryScreen extends JPanel {
         if(current == null) return null;
 
         return current.getName();
-        // for(FoodCategory cat : FoodCategory.values()){
-        //     if(cards.getComponent(cards.getComponentZOrder(current)).getName().equals(cat.name())){
-        //         return cat.name();
-        //     }
-        // }
-        // return null;
     }
 }
