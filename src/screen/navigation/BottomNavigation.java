@@ -1,5 +1,7 @@
 package src.screen.navigation;
 
+import src.screen.utils.IconHelper;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -35,20 +37,23 @@ public class BottomNavigation extends JPanel{
         return button;
     }
 
-    private JPanel createNavigationPanel() {
-        homeButton = new JButton("홈");
-        viewMenuButton = new JButton("메뉴보기");
-        viewFavoritesButton = new JButton("즐겨찾기");
-        viewPlannerButton = new JButton("플래너");
+    private JButton buildButton(ImageIcon icon) {
+        if (icon != null && icon.getIconWidth() > 0) {
+            Image scaled = icon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
+            icon = new ImageIcon(scaled);
+        }
+        JButton button = new JButton(icon);
+        button.setPreferredSize(new Dimension(32, 32));
+        return button;
+    }
 
-        Font buttonFont = new Font("SansSerif", Font.BOLD, 11);
-        homeButton.setFont(buttonFont);
-        viewMenuButton.setFont(buttonFont);
-        viewFavoritesButton.setFont(buttonFont);
-        viewPlannerButton.setFont(buttonFont);
+    private JPanel createNavigationPanel() {
+        homeButton = buildButton(IconHelper.getHomeIcon());
+        viewMenuButton = buildButton(IconHelper.getMenuIcon());
+        viewPlannerButton = buildButton(IconHelper.getCalendarIcon());
+        viewFavoritesButton = buildButton(IconHelper.getFavorite());
 
         JPanel panel = new JPanel(new GridLayout(1, 4, 5, 5));
-        panel.setBackground(Color.LIGHT_GRAY);
 
         panel.add(customizeButton(homeButton));
         panel.add(customizeButton(viewMenuButton));

@@ -13,7 +13,7 @@ public class RecipeCardPanel extends JPanel {
 
     public RecipeCardPanel(Recipe recipe, Consumer<Recipe> onClickAction) {
         setLayout(new BorderLayout(15, 0));
-        setBackground(Color.WHITE);
+//        setBackground(Color.WHITE);
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(200, 200, 200), 1),
                 BorderFactory.createEmptyBorder(5, 10, 5, 10)

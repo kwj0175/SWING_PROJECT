@@ -7,10 +7,40 @@ import java.net.URL;
 public class IconHelper {
     private static final String BASE_PATH = "/resources/icons/";
     private static final String FRIDGE_PNG = "fridge.png";
-    private static final String FAVORITE_JPG  = "favorite.jpg";
+    private static final String FAVORITE_JPG  = "favorite1.png";
     private static final String ADDRECIPE_JPG = "addrecipe.jpg";
+    private static final String HOME_PNG = "home.png";
+    private static final String MENU_PNG = "calendar1.png";
+    private static final String CALENDAR_PNG = "calendar1.png";
 
     private IconHelper() {
+    }
+
+    public static ImageIcon getMenuIcon() {
+        ImageIcon icon = loadIcon(BASE_PATH + MENU_PNG);
+        if (icon != null) {
+            Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        }
+        return null;
+    }
+
+    public static ImageIcon getCalendarIcon() {
+        ImageIcon icon = loadIcon(BASE_PATH + CALENDAR_PNG);
+        if (icon != null) {
+            Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        }
+        return null;
+    }
+
+    public static ImageIcon getHomeIcon() {
+        ImageIcon icon = loadIcon(BASE_PATH + HOME_PNG);
+        if (icon != null) {
+            Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            return new ImageIcon(img);
+        }
+        return null;
     }
 
     public static ImageIcon getFridge() {
