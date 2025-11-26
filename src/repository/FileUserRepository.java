@@ -1,6 +1,6 @@
-package repository;
+package src.repository;
 
-import entity.User;
+import src.entity.User;
 
 import java.io.*;
 import java.util.ArrayList;

@@ -1,20 +1,20 @@
-package screen;
+package src.screen;
 
-import entity.Recipe;
-import entity.User;
-import manager.RecipeManager;
-import manager.UserManager;
-import repository.FileRecipeRepository;
-import repository.FileUserRepository;
-import repository.RecipeRepository;
-import repository.UserRepository;
-import screen.category.CategoryScreen;
-import screen.home.HomeScreen;
-import screen.login.LoginScreen;
-import screen.navigation.BottomNavigation;
-import screen.navigation.NavigationHandler;
-import screen.planner.PlannerScreen;
-import screen.recipe.RecipeScreen;
+import src.entity.Recipe;
+import src.entity.User;
+import src.manager.RecipeManager;
+import src.manager.UserManager;
+import src.repository.FileRecipeRepository;
+import src.repository.FileUserRepository;
+import src.repository.RecipeRepository;
+import src.repository.UserRepository;
+import src.screen.category.CategoryScreen;
+import src.screen.home.HomeScreen;
+import src.screen.login.LoginScreen;
+import src.screen.navigation.BottomNavigation;
+import src.screen.navigation.NavigationHandler;
+import src.screen.planner.PlannerScreen;
+import src.screen.recipe.RecipeScreen;
 
 import javax.swing.*;
 import java.awt.*;
