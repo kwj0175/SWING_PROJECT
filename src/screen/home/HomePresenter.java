@@ -1,7 +1,7 @@
-package src.screen.home;
+package screen.home;
 
-import src.entity.Recipe;
-import src.manager.RecipeManager;
+import entity.Recipe;
+import manager.RecipeManager;
 
 import java.util.List;
 

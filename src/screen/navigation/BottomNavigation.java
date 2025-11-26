@@ -1,4 +1,4 @@
-package src.screen.navigation;
+package screen.navigation;
 
 import javax.swing.*;
 import java.awt.*;

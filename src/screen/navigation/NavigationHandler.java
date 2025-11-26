@@ -1,4 +1,4 @@
-package src.screen.navigation;
+package screen.navigation;
 
 public interface NavigationHandler {
     void displayHomeScreen();
