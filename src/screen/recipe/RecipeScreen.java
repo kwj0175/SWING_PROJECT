@@ -1,8 +1,9 @@
-package screen.recipe;
+package src.screen.recipe;
 
 import src.entity.Recipe;
 import src.screen.MainScreen;
 import src.screen.utils.IconHelper;
+import src.screen.utils.ImagePanel;
 import src.screen.utils.ScreenHelper;
 import src.screen.utils.VerticalScrollPanel;
 

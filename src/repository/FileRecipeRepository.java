@@ -1,7 +1,7 @@
-package repository;
+package src.repository;
 
-import entity.FoodCategory;
-import entity.Recipe;
+import src.entity.FoodCategory;
+import src.entity.Recipe;
 
 import java.io.BufferedReader;
 import java.io.File;

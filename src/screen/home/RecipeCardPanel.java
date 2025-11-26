@@ -1,7 +1,7 @@
 package src.screen.home;
 
 import src.entity.Recipe;
-import src.screen.recipe.ImagePanel;
+import src.screen.utils.ImagePanel;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,7 +1,7 @@
-package screen.login;
+package src.screen.login;
 
-import manager.UserManager;
-import screen.utils.ScreenHelper;
+import src.manager.UserManager;
+import src.screen.utils.ScreenHelper;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

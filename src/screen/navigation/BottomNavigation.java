@@ -1,4 +1,4 @@
-package screen.navigation;
+package src.screen.navigation;
 
 import src.screen.utils.IconHelper;
 

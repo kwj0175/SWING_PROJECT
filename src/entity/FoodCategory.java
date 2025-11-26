@@ -1,4 +1,4 @@
-package entity;
+package src.entity;
 
 public enum FoodCategory {
     MAIN_SIDE_DISH("메인 반찬", "main_side_dishes"),

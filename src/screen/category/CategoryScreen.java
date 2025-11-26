@@ -4,7 +4,7 @@ import src.entity.FoodCategory;
 import src.entity.Recipe;
 import src.manager.RecipeManager;
 import src.screen.MainScreen;
-import src.screen.recipe.ImagePanel;
+import src.screen.utils.ImagePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +31,7 @@ public class CategoryScreen extends JPanel {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 3, 5));
         inputField = new JTextField();
-        JButton searchButton = new JButton("검색");
+        JButton searchButton = new JButton("검색");//검색버튼
 
         ActionListener searchAction = e -> searchCurrentCard(inputField.getText().trim());
         inputField.addActionListener(searchAction);
@@ -45,17 +45,17 @@ public class CategoryScreen extends JPanel {
                 new GridLayout(1, FoodCategory.values().length, 5, 5)
         );
 
-        for(FoodCategory cat : FoodCategory.values()) {
+        for(FoodCategory cat : FoodCategory.values()) {//카테고리 버튼 생성
             JButton btn = new JButton(cat.getDisplayName());
             btn.setFont(new Font("SansSerif", Font.BOLD, 12));
-
+            
             categoryPanel.add(btn);
             btn.addActionListener(e -> {
                 cardLayout.show(cards, cat.name());
                 inputField.setText("");
                 searchCurrentCard("");
             });
-
+            
         }
 
         // 헤더 패널
@@ -93,6 +93,7 @@ public class CategoryScreen extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         panel.setBackground(Color.WHITE);
 
+        // 메뉴 카드 생성
         for(Recipe recipe : recipes) {
             JPanel menuPanel = new JPanel(new BorderLayout());
             menuPanel.setBackground(Color.WHITE);
@@ -125,7 +126,7 @@ public class CategoryScreen extends JPanel {
 
             menuPanel.addMouseListener(new MouseAdapter() {
                 public void mouseEntered(MouseEvent e) {
-                    menuPanel.setBorder(BorderFactory.createLineBorder(new Color(100, 150, 255), 2));
+                    menuPanel.setBorder(BorderFactory.createLineBorder(new Color(100, 150, 255), 2));//
                     menuPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 }
                 public void mouseExited(MouseEvent e) {

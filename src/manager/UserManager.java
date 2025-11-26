@@ -1,7 +1,7 @@
-package manager;
+package src.manager;
 
-import entity.User;
-import repository.UserRepository;
+import src.entity.User;
+import src.repository.UserRepository;
 
 import java.io.*;
 import java.util.ArrayList;

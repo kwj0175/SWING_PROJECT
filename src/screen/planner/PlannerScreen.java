@@ -1,4 +1,4 @@
-package screen.planner;
+package src.screen.planner;
 
 import src.entity.Recipe;
 import src.manager.RecipeManager;
