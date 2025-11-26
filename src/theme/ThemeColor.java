@@ -1,4 +1,4 @@
-package src.theme;
+package theme;
 
 import javax.swing.*;
 import java.io.FileInputStream;

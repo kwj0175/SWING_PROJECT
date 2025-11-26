@@ -20,6 +20,7 @@ public class CategoryPresenter {
     public List<Recipe> loadRecipesByCategory(FoodCategory category) {
         return recipeManager.getRecipesByCategory(category);
     }
+
     public List<Recipe> filterRecipes(List<Recipe> recipes, String searchText) {
         // 1. 검색어가 비어 있거나 null인 경우, 원본 목록 전체를 반환합니다.
         if (searchText == null || searchText.trim().isEmpty()) {
