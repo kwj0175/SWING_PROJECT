@@ -113,4 +113,8 @@ public class MainScreen extends JFrame implements NavigationHandler {
         cardLayout.show(cardPanel, "Favorite");
     }
 
+    public void refreshFavoriteScreen() {
+        favoriteScreen.refreshFavoriteList();
+    }
+
 }
