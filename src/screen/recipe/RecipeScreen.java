@@ -79,18 +79,24 @@ public class RecipeScreen extends JPanel {
         // 즐겨찾기 버튼: 콘솔 출력만
         Component[] favComps = favoriteBtnWrapper.getComponents();
         if (favComps.length > 0 && favComps[0] instanceof JButton favBtn) {
+            favBtn.setRolloverEnabled(true);
+            favBtn.setRolloverIcon(IconHelper.getSFavoriteOffIcon());
+
             favBtn.addActionListener(e -> {
                 System.out.println("[즐겨찾기 버튼 클릭] " + nameLabel.getText());
+                recipePresenter.setFavoriteRecipe(currentRecipe);
+                mainScreen.refreshFavoriteScreen();
             });
         }
-
         
         Component[] addComps = recipeAddWrapper.getComponents();
         if (addComps.length > 0 && addComps[0] instanceof JButton addBtn) {
+            addBtn.setRolloverEnabled(true);
+            addBtn.setRolloverIcon(IconHelper.getSCalendarOffIcon());
+
             addBtn.addActionListener(e -> {
                 if (currentRecipe != null) {
                     System.out.println("[레시피 추가 버튼 클릭] " + currentRecipe.getName());
-                    
                 } else {
                     System.out.println("[레시피 추가 버튼 클릭] (선택된 레시피 없음)");
                 }
