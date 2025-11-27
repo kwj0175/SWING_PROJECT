@@ -196,7 +196,7 @@ public class PlannerScreen extends JPanel {
     private JPanel buildRecipe() {
         recipePanel = new JPanel();
         recipePanel.setLayout(new BorderLayout());
-        recipePanel.setPreferredSize(new Dimension(360, 280));
+        recipePanel.setPreferredSize(new Dimension(360, 300));
 
         recipePanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(
@@ -232,7 +232,7 @@ public class PlannerScreen extends JPanel {
         model.setColumnIdentifiers(COLUMNS);
         table = new JTable(model);
         setupTableInteraction();
-        table.setRowHeight(40);
+        table.setRowHeight(55); //행높이
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -241,6 +241,7 @@ public class PlannerScreen extends JPanel {
 
     private void buildButtons(JPanel topPanel) {
         topPanel.setLayout(new BorderLayout());
+        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
 
         prevWeekBtn = new JButton("◀");
         nextWeekBtn = new JButton("▶");

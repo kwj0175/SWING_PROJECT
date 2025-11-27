@@ -29,10 +29,6 @@ public class PlannerOverlay extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
 
-        // 상단 부분만 반투명 처리
-        g2d.setColor(new Color(0, 0, 0, 100)); // 더 연한 반투명
-        g2d.fillRect(0, 0, getWidth(), getHeight() - 300); // 하단 300px는 투명하게
-
         g2d.dispose();
     }
 
@@ -59,8 +55,8 @@ public class PlannerOverlay extends JPanel {
                 BorderFactory.createLineBorder(new Color(100, 150, 255), 3),
                 BorderFactory.createEmptyBorder(5, 15, 15, 15)
         ));
-        card.setPreferredSize(new Dimension(340, 240));
-        card.setMaximumSize(new Dimension(340, 240));
+        card.setPreferredSize(new Dimension(340, 300));
+        card.setMaximumSize(new Dimension(340, 300));
 
         // 제목
         titleLabel = new JLabel("", SwingConstants.CENTER);
@@ -68,7 +64,7 @@ public class PlannerOverlay extends JPanel {
 
         // 이미지
         imagePanel = new JPanel(new BorderLayout());
-        imagePanel.setPreferredSize(new Dimension(280, 120));
+        imagePanel.setPreferredSize(new Dimension(280, 200));
 
         updateRecipeView();
 
