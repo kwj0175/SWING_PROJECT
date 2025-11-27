@@ -6,22 +6,31 @@ import src.screen.utils.ImagePanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.geom.Area;
 
 public class PlannerOverlay extends JPanel {
     private Recipe recipe;
     private final ActionListener onCancelListener;
 
+    private Rectangle highlightRect;
+
     private JLabel titleLabel;
     private JPanel imagePanel;
+    private JPanel recipeCard;
 
     public PlannerOverlay(Recipe recipe, ActionListener onCancelListener) {
         this.recipe = recipe;
         this.onCancelListener = onCancelListener;
 
         setOpaque(false);
-        setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
 
         initComponents();
+    }
+
+    public void setHighlightRect(Rectangle rect) {
+        this.highlightRect = rect;
+        repaint();
     }
 
     @Override
@@ -29,49 +38,71 @@ public class PlannerOverlay extends JPanel {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
 
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+
+        Color base = UIManager.getColor("Panel.background");
+        if (base == null) {
+            base = Color.BLACK;
+        }
+        Color overlayColor = new Color(
+                base.getRed(),
+                base.getGreen(),
+                base.getBlue(),
+                120
+        );
+
+        Rectangle full = new Rectangle(0, 0, getWidth(), getHeight());
+        Area dimArea = new Area(full);
+
+        if (highlightRect != null) {
+            java.awt.geom.Area hole = new java.awt.geom.Area(highlightRect);
+            dimArea.subtract(hole);
+        }
+
+        g2d.setColor(overlayColor);
+        g2d.fill(dimArea);
+
         g2d.dispose();
     }
 
-    private void initComponents() {
-        JPanel recipeCard = createRecipeCard();
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 1; // 하단에 배치
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0; // 하단에 고정
-        gbc.anchor = GridBagConstraints.SOUTH;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(0, 0, 10, 0); // 하단 여백
-
-        add(recipeCard, gbc);
+    @Override
+    public boolean contains(int x, int y) {
+        return recipeCard != null && recipeCard.getBounds().contains(x, y);
     }
 
-    private JPanel createRecipeCard() {
-        JPanel card = new JPanel();
-        card.setLayout(new BorderLayout(10, 10));
-        card.setBackground(Color.WHITE);
-        card.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(100, 150, 255), 3),
+    private void initComponents() {
+        createRecipeCard();
+
+        JPanel space = new JPanel();
+        space.setOpaque(false);
+
+        add(space, BorderLayout.CENTER);
+        add(recipeCard, BorderLayout.SOUTH);
+    }
+
+    private void createRecipeCard() {
+        recipeCard = new JPanel();
+        recipeCard.setLayout(new BorderLayout(10, 10));
+
+        Color borderColor = UIManager.getColor("Panel.borderColor");
+        recipeCard.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(borderColor, 3),
                 BorderFactory.createEmptyBorder(5, 15, 15, 15)
         ));
-        card.setPreferredSize(new Dimension(340, 300));
-        card.setMaximumSize(new Dimension(340, 300));
+        recipeCard.setPreferredSize(new Dimension(340, 300));
+        recipeCard.setMaximumSize(new Dimension(340, 300));
 
-        // 제목
         titleLabel = new JLabel("", SwingConstants.CENTER);
         titleLabel.setFont(new Font("맑은 고딕", Font.BOLD, 18));
 
-        // 이미지
         imagePanel = new JPanel(new BorderLayout());
         imagePanel.setPreferredSize(new Dimension(280, 200));
 
         updateRecipeView();
 
-        // 안내 메시지 및 버튼
         JLabel guideLabel = new JLabel("원하는 칸을 클릭하세요", SwingConstants.CENTER);
         guideLabel.setFont(new Font("맑은 고딕", Font.BOLD, 13));
-        guideLabel.setForeground(new Color(100, 150, 255));
 
         JButton cancelBtn = new JButton("취소");
         cancelBtn.setFont(new Font("맑은 고딕", Font.BOLD, 12));
@@ -83,11 +114,9 @@ public class PlannerOverlay extends JPanel {
         bottomPanel.add(cancelBtn, BorderLayout.SOUTH);
 
         // 레이아웃 구성
-        card.add(titleLabel, BorderLayout.NORTH);
-        card.add(imagePanel, BorderLayout.CENTER);
-        card.add(bottomPanel, BorderLayout.SOUTH);
-
-        return card;
+        recipeCard.add(titleLabel, BorderLayout.NORTH);
+        recipeCard.add(imagePanel, BorderLayout.CENTER);
+        recipeCard.add(bottomPanel, BorderLayout.SOUTH);
     }
 
     private void updateRecipeView() {
@@ -109,11 +138,11 @@ public class PlannerOverlay extends JPanel {
         }
     }
 
-    public Recipe getRecipe() {
+    public Recipe getCurrentRecipe() {
         return recipe;
     }
 
-    public void setRecipe(Recipe recipe) {
+    public void setCurrentRecipe(Recipe recipe) {
         this.recipe = recipe;
         updateRecipeView();
     }
