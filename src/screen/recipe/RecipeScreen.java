@@ -96,6 +96,7 @@ public class RecipeScreen extends JPanel {
 
             addBtn.addActionListener(e -> {
                 if (currentRecipe != null) {
+                    mainScreen.displayPlannerScreenWithRecipe(currentRecipe);
                     System.out.println("[레시피 추가 버튼 클릭] " + currentRecipe.getName());
                 } else {
                     System.out.println("[레시피 추가 버튼 클릭] (선택된 레시피 없음)");
