@@ -14,6 +14,13 @@ import java.util.List;
 
 public class RecipeScreen extends JPanel {
 
+    // 글자 크기 & 간격 상수
+    private static final int TITLE_FONT_SIZE       = 22; // 제목
+    private static final int AMOUNT_TIME_FONT_SIZE = 18; // 인분/시간
+    private static final int STEP_FONT_SIZE        = 14; // 조리방법
+    private static final int DETAIL_FONT_SIZE      = 14; // 재료
+    private static final int STEP_GAP              = 20;  // 조리방법 사이 간격
+
     private final RecipePresenter recipePresenter;
     private final MainScreen mainScreen;
 
@@ -38,13 +45,12 @@ public class RecipeScreen extends JPanel {
         add(form, BorderLayout.CENTER);
     }
 
-    /* ---------- 상단 오른쪽 추가 버튼 ---------- */
+    /* ---------- 공통 버튼 빌더 (아이콘 버튼) ---------- */
 
     private JPanel buildButton(ImageIcon icon) {
         JButton button = new JButton();
-        ImageIcon addIcon = icon;
-        if (addIcon != null) {
-            button.setIcon(addIcon);
+        if (icon != null) {
+            button.setIcon(icon);
         }
         button.setMargin(new Insets(0, 0, 0, 0));
         button.setBorderPainted(false);
@@ -59,21 +65,34 @@ public class RecipeScreen extends JPanel {
         return wrapper;
     }
 
-    /* ---------- 제목 / 이미지 / 인분·시간 ---------- */
+    /* ---------- 제목 / 버튼 / 이미지 / 인분·시간 ---------- */
 
     private JPanel buildNamePanel() {
-        nameLabel = ScreenHelper.setText("", 20);
+        // 제목 글자 키움
+        nameLabel = ScreenHelper.setText("", TITLE_FONT_SIZE);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
+        // 즐겨찾기 / 플래너 추가 버튼 (아이콘 사용)
         JPanel favoriteBtnWrapper = buildButton(IconHelper.getSFavoriteOnIcon());
-        JPanel recipeAddWrapper = buildButton(IconHelper.getSCalendarOnIcon());
+        JPanel recipeAddWrapper   = buildButton(IconHelper.getSCalendarOnIcon());
 
-        // 플래너에 추가 버튼 이벤트
-        Component[] components = recipeAddWrapper.getComponents();
-        if (components.length > 0 && components[0] instanceof JButton addBtn) {
+        // 즐겨찾기 버튼: 콘솔 출력만
+        Component[] favComps = favoriteBtnWrapper.getComponents();
+        if (favComps.length > 0 && favComps[0] instanceof JButton favBtn) {
+            favBtn.addActionListener(e -> {
+                System.out.println("[즐겨찾기 버튼 클릭] " + nameLabel.getText());
+            });
+        }
+
+        
+        Component[] addComps = recipeAddWrapper.getComponents();
+        if (addComps.length > 0 && addComps[0] instanceof JButton addBtn) {
             addBtn.addActionListener(e -> {
                 if (currentRecipe != null) {
-                    mainScreen.displayPlannerScreenWithRecipe(currentRecipe);
+                    System.out.println("[레시피 추가 버튼 클릭] " + currentRecipe.getName());
+                    
+                } else {
+                    System.out.println("[레시피 추가 버튼 클릭] (선택된 레시피 없음)");
                 }
             });
         }
@@ -96,8 +115,9 @@ public class RecipeScreen extends JPanel {
     }
 
     private JPanel buildAmountTimePanel() {
-        amountLabel = ScreenHelper.setText("", 16);
-        timeLabel = ScreenHelper.setText("", 16);
+        
+        amountLabel = ScreenHelper.setText("", AMOUNT_TIME_FONT_SIZE);
+        timeLabel   = ScreenHelper.setText("", AMOUNT_TIME_FONT_SIZE);
 
         JPanel amountTimePanel = ScreenHelper.cardPanel();
         amountTimePanel.setBorder(
@@ -146,7 +166,8 @@ public class RecipeScreen extends JPanel {
         area.setBorder(null);
         area.setMargin(new Insets(0, 0, 0, 0));
 
-        JLabel tmp = ScreenHelper.setText("");
+        
+        JLabel tmp = ScreenHelper.setText("", STEP_FONT_SIZE);
         area.setFont(tmp.getFont());
 
         return area;
@@ -159,7 +180,7 @@ public class RecipeScreen extends JPanel {
         root.setBorder(BorderFactory.createEmptyBorder(30, 20, 10, 20));
         root.setLayout(new BorderLayout());
 
-        // 헤더 (제목 + 이미지 + 인분/시간)
+        
         JPanel header = new JPanel();
         header.setOpaque(false);
         GroupLayout headerLayout = ScreenHelper.groupLayout(header);
@@ -198,7 +219,7 @@ public class RecipeScreen extends JPanel {
         content.add(Box.createVerticalStrut(8));
         content.add(stepsPanel);
 
-        // 스크롤 전체 적용
+        
         scrollPane = new JScrollPane(content);
         scrollPane.setBorder(null);
         scrollPane.setOpaque(false);
@@ -253,7 +274,7 @@ public class RecipeScreen extends JPanel {
         this.currentRecipe = recipe;
         recipePresenter.showRecipe(recipe);
 
-        // 레시피 바뀔 때마다 맨 위로 스크롤
+        
         SwingUtilities.invokeLater(() -> {
             if (scrollPane != null) {
                 scrollPane.getVerticalScrollBar().setValue(0);
@@ -286,7 +307,7 @@ public class RecipeScreen extends JPanel {
         detailsPanel.removeAll();
         if (details != null) {
             for (String data : details) {
-                JLabel label = ScreenHelper.setText(data);
+                JLabel label = ScreenHelper.setText(data, DETAIL_FONT_SIZE);
                 label.setHorizontalAlignment(SwingConstants.CENTER);
                 detailsPanel.add(label);
             }
@@ -298,12 +319,18 @@ public class RecipeScreen extends JPanel {
         stepsPanel.removeAll();
         if (steps != null) {
             boolean first = true;
-            for (String step : steps) {
-                JComponent comp = createMultiLineText(step);
+            for (String raw : steps) {
+                if (raw == null) continue;
+
+                String text = raw.trim();
+                if (text.isEmpty()) continue;
+
+                JComponent comp = createMultiLineText(text);
                 comp.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+               
                 if (!first) {
-                    stepsPanel.add(Box.createVerticalStrut(4));
+                    stepsPanel.add(Box.createVerticalStrut(STEP_GAP));
                 }
                 stepsPanel.add(comp);
                 first = false;
