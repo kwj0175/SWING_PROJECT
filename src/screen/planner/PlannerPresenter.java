@@ -6,9 +6,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.time.temporal.WeekFields;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class PlannerPresenter {
     private int currentWeek;
@@ -34,12 +32,10 @@ public class PlannerPresenter {
         currentWeek = today.get(weekFields.weekOfMonth());
     }
 
-    /** 화면에 표시할 주차 텍스트 */
     public String getWeekText() {
         return currentYear + "년 " + currentMonth + "월 ";// + currentWeek + "주차";
     }
 
-    /** 현재 주의 요일 헤더 (예: "01 (월)" ~ "07 (일)" 이런 식) */
     public String[] getWeekHeaders() {
         LocalDate startOfWeek = LocalDate.of(currentYear, currentMonth, 1)
                 .with(weekFields.weekOfMonth(), currentWeek)
@@ -58,6 +54,20 @@ public class PlannerPresenter {
         return columns;
     }
 
+    public List<Recipe> filterRecipes(String keyword, List<Recipe> allRecipes) {
+        String lowerKeyword = keyword.toLowerCase().trim();
+        List<Recipe> result = new ArrayList<>();
+
+        for (Recipe recipe : allRecipes) {
+            if (lowerKeyword.isEmpty()
+                    || recipe.getName().toLowerCase().contains(lowerKeyword)
+                    || recipe.getTitle().toLowerCase().contains(lowerKeyword)) {
+                result.add(recipe);
+            }
+        }
+        return result;
+    }
+
     public void movePrevWeek() {
         currentWeek--;
         if (currentWeek < 1) {
@@ -66,7 +76,6 @@ public class PlannerPresenter {
                 currentYear--;
                 currentMonth = 12;
             }
-            // 대충 5주까지 있다고 가정한 기존 로직 유지
             currentWeek = 5;
         }
     }

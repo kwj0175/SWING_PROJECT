@@ -105,7 +105,7 @@ public class MainScreen extends JFrame implements NavigationHandler {
     }
 
     public void displayPlannerScreenWithRecipe(Recipe recipe) {
-        plannerScreen.enterRecipeAddMode(recipe);
+        plannerScreen.startOverlayAddMode(recipe);
         cardLayout.show(cardPanel, "Planner");
     }
 

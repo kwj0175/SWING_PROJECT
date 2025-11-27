@@ -35,7 +35,7 @@ public class CategoryScreen extends JPanel {
         JPanel topPanel = new JPanel(new BorderLayout(10, 0));
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         inputField = new JTextField();
-        JButton searchButton = new JButton(IconHelper.getSearchOffIcon());
+        JButton searchButton = new JButton(IconHelper.getSearchOnIcon());
 
         ActionListener searchAction = e -> searchCurrentCard(inputField.getText().trim());
         inputField.addActionListener(searchAction);
