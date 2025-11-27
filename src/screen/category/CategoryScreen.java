@@ -14,8 +14,8 @@ import java.util.List;
 
 public class CategoryScreen extends JPanel {
     private JTextField inputField;
-    private JPanel cards;
-    private CardLayout cardLayout;
+    protected JPanel cards;
+    protected CardLayout cardLayout;
 
     protected CategoryPresenter categoryPresenter;
     private final MainScreen mainScreen;
@@ -31,7 +31,7 @@ public class CategoryScreen extends JPanel {
         return new CategoryPresenter(this, recipeManager);
     }
 
-    private void initComponents() {
+    protected void initComponents() {
         JPanel topPanel = new JPanel(new BorderLayout(10, 0));
         topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         inputField = new JTextField();
@@ -69,7 +69,7 @@ public class CategoryScreen extends JPanel {
         add(cards, BorderLayout.CENTER);
     }
 
-    private JPanel buildCategoryPanel() {
+    protected JPanel buildCategoryPanel() {
         JPanel categoryPanel = new JPanel(
                 new GridLayout(1, FoodCategory.values().length, 10, 10)
         );
@@ -92,11 +92,11 @@ public class CategoryScreen extends JPanel {
         return categoryPanel;
     }
 
-    private List<Recipe> getRecipesByCategory(FoodCategory category) {
+    protected List<Recipe> getRecipesByCategory(FoodCategory category) {
         return categoryPresenter.loadRecipesByCategory(category);
     }
 
-    private JScrollPane createScrollPanel(List<Recipe> recipes) {
+    protected JScrollPane createScrollPanel(List<Recipe> recipes) {
         JPanel panel = new JPanel(new GridLayout(0, 2, 15, 15));
         panel.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
         Color borderColor = UIManager.getColor("Panel.borderColor");
@@ -146,12 +146,12 @@ public class CategoryScreen extends JPanel {
         return scrollPane;
     }
 
-    private static Component buildImgComp(Recipe recipe) {
+    protected static Component buildImgComp(Recipe recipe) {
         String path = recipe.getImagePath();
         return new ImagePanel(path);
     }
 
-    private void searchCurrentCard(String text) {
+    protected void searchCurrentCard(String text) {
         String cardName = getCurrentCardName();
         Component current = getCurrentCard();
 
@@ -179,14 +179,14 @@ public class CategoryScreen extends JPanel {
         cards.repaint();
     }
 
-    private Component getCurrentCard() {
+    protected Component getCurrentCard() {
         for(Component comp : cards.getComponents()) {
             if(comp.isVisible()) return comp;
         }
         return null;
     }
 
-    private String getCurrentCardName(){
+    protected String getCurrentCardName(){
         Component current = getCurrentCard();
         if(current == null) return null;
 
