@@ -29,6 +29,10 @@ public class RecipePresenter {
         return result.toArray(new String[0]);
     }
 
+    public void setFavoriteRecipe(Recipe recipe) {
+        recipe.setFavorite(!recipe.getFavorite());
+    }
+
     public void showRecipe(Recipe recipe) {
         if (recipe == null) {
             view.updateRecipeView(
