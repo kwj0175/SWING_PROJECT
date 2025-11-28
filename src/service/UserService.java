@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
+    public static final int SIGN_UP_SUCCESS = 0;
+    public static final int SIGN_UP_DUPLICATE_ID = 1;
+
     private final List<User> userList;
     private final UserRepository userRepository;
 

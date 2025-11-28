@@ -4,8 +4,6 @@ import src.service.UserService;
 import src.view.utils.ScreenHelper;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class SignUpView extends JDialog {
     private final UserService userService;
@@ -25,27 +23,14 @@ public class SignUpView extends JDialog {
         pack();
         setLocationRelativeTo(parentFrame);
 
-        // "뒤로가기" 버튼 리스너
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
-
-        // [회원가입하기] 버튼 리스너
-        signUpButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handleSignUp();
-            }
-        });
+        backButton.addActionListener(e -> dispose());
+        signUpButton.addActionListener(e -> handleSignUp());
     }
 
     private void handleSignUp() {
-        String id = idField.getText();
-        String pw = new String(pwField.getPassword());
-        String name = nameField.getText();
+        String id = idField.getText().trim();
+        String pw = new String(pwField.getPassword()).trim();
+        String name = nameField.getText().trim();
 
         if (id.isEmpty() || pw.isEmpty() || name.isEmpty()) {
             JOptionPane.showMessageDialog(this, "모든 항목을 입력해주세요.", "입력 오류", JOptionPane.WARNING_MESSAGE);
@@ -55,17 +40,16 @@ public class SignUpView extends JDialog {
         int result = userService.signUp(id, pw, name);
 
         switch (result) {
-            case 0:
+            case UserService.SIGN_UP_SUCCESS -> {
                 JOptionPane.showMessageDialog(this, "회원가입 성공! 로그인 해주세요.", "성공", JOptionPane.INFORMATION_MESSAGE);
                 dispose();
-                break;
-            case 1:
+            }
+            case UserService.SIGN_UP_DUPLICATE_ID -> {
                 JOptionPane.showMessageDialog(this, "이미 사용 중인 ID입니다.", "ID 중복 오류", JOptionPane.ERROR_MESSAGE);
-                break;
-            case 2:
-            default:
+            }
+            default -> {
                 JOptionPane.showMessageDialog(this, "시스템 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
-                break;
+            }
         }
     }
 
