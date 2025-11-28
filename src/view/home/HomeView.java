@@ -16,17 +16,15 @@ import java.util.List;
 
 public class HomeView extends JPanel {
     private final MainScreen mainScreen;
-    private final RecipeService recipeService;
     private final HomePresenter homePresenter;
+    private final JLabel welcomeLabel;
 
     private User currentUser;
     private List<Recipe> recommendedRecipes;
-    private JLabel welcomeLabel;
     private JPanel recommendListPanel;
 
     public HomeView(MainScreen mainScreen, RecipeService recipeService) {
         this.mainScreen = mainScreen;
-        this.recipeService = recipeService;
         this.homePresenter = new HomePresenter(this, recipeService);
         this.recommendedRecipes = new ArrayList<>();
 
@@ -64,14 +62,7 @@ public class HomeView extends JPanel {
     }
 
     private JPanel createInfoPanel() {
-        JLabel fridgeBtn = new JLabel("");
-        ImageIcon icon = IconHelper.getFridgeOnIcon();
-
-        fridgeBtn.setIcon(icon);
-
-        fridgeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        fridgeBtn.setToolTipText("냉장고 재료 입력하기");
-
+        JLabel fridgeBtn = createFridgeBtn();
         JPanel infoPanel = ScreenHelper.noColorCardPanel();
         infoPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         infoPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 15, 0));
@@ -79,6 +70,50 @@ public class HomeView extends JPanel {
         infoPanel.add(fridgeBtn);
         infoPanel.add(welcomeLabel);
 
+        fridgeClickedEvent(fridgeBtn);
+        return infoPanel;
+    }
+
+    private JLabel createFridgeBtn() {
+        JLabel fridgeBtn = new JLabel("");
+        ImageIcon icon = IconHelper.getFridgeOnIcon();
+
+        fridgeBtn.setIcon(icon);
+
+        fridgeBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        fridgeBtn.setToolTipText("냉장고 재료 입력하기");
+        return fridgeBtn;
+    }
+
+    private JPanel createContainer() {
+        JPanel container = new JPanel(new BorderLayout(0, 5));
+        container.setOpaque(false);
+        container.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        return container;
+    }
+
+    private JLabel createTitleLabel() {
+        JLabel title = ScreenHelper.setText("오늘의 추천 메뉴", 16);
+        title.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
+        return title;
+    }
+
+    private JPanel createRecommendPanel() {
+        JPanel container = createContainer();
+        JLabel titleLabel = createTitleLabel();
+
+        recommendListPanel = new JPanel(new GridLayout(4, 1, 0, 10));
+        recommendListPanel.setOpaque(false);
+
+        updateRecommendList();
+
+        container.add(titleLabel, BorderLayout.NORTH);
+        container.add(recommendListPanel, BorderLayout.CENTER);
+
+        return container;
+    }
+
+    private void fridgeClickedEvent(JLabel fridgeBtn) {
         fridgeBtn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -95,27 +130,6 @@ public class HomeView extends JPanel {
                 fridgeBtn.setIcon(IconHelper.getFridgeOnIcon());
             }
         });
-
-        return infoPanel;
-    }
-
-    private JPanel createRecommendPanel() {
-        JPanel container = new JPanel(new BorderLayout(0, 5));
-        container.setOpaque(false);
-        container.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
-
-        JLabel title = ScreenHelper.setText("오늘의 추천 메뉴", 16);
-        title.setBorder(BorderFactory.createEmptyBorder(0, 5, 5, 0));
-
-        recommendListPanel = new JPanel(new GridLayout(4, 1, 0, 10));
-        recommendListPanel.setOpaque(false);
-
-        updateRecommendList();
-
-        container.add(title, BorderLayout.NORTH);
-        container.add(recommendListPanel, BorderLayout.CENTER);
-
-        return container;
     }
 
     private void updateRecommendList() {

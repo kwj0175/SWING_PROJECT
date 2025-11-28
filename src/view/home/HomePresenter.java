@@ -14,13 +14,11 @@ public class HomePresenter {
         this.recipeService = recipeService;
     }
 
-    /** 앱 시작 시 기본 추천 불러오기 */
     public void loadInitialRecommendations() {
         List<Recipe> recipes = recipeService.getRecommendationsPerCategory();
         view.showRecommendations(recipes);
     }
 
-    /** 냉장고 재료 입력 후 호출 */
     public void onIngredientsSubmitted(String input) {
         List<Recipe> recs = recipeService.getRecommendationsByIngredients(input);
         view.showRecommendations(recs);
