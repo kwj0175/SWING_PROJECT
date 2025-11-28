@@ -16,7 +16,7 @@ public class FavoriteView extends CategoryView {
 
     @Override
     protected FavoritePresenter createPresenter(RecipeService recipeService) {
-        return new FavoritePresenter(this, recipeService);
+        return new FavoritePresenter(recipeService);
     }
 
     public void refreshFavoriteList() {

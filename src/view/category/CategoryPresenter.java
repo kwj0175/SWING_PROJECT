@@ -9,11 +9,9 @@ import java.util.stream.Collectors;
 
 public class CategoryPresenter {
 
-    private final CategoryView view;
     protected final RecipeService recipeService;
 
-    public CategoryPresenter(CategoryView view, RecipeService recipeService) {
-        this.view = view;
+    public CategoryPresenter(RecipeService recipeService) {
         this.recipeService = recipeService;
     }
 

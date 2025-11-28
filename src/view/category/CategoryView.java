@@ -13,12 +13,13 @@ import java.awt.event.*;
 import java.util.List;
 
 public class CategoryView extends JPanel {
-    private JTextField inputField;
+    private final MainScreen mainScreen;
+
     protected JPanel cards;
     protected CardLayout cardLayout;
-
     protected CategoryPresenter categoryPresenter;
-    private final MainScreen mainScreen;
+    
+    private JTextField inputField;
 
     public CategoryView(MainScreen mainScreen, RecipeService recipeService) {
         setLayout(new BorderLayout());
@@ -28,34 +29,34 @@ public class CategoryView extends JPanel {
     }
 
     protected CategoryPresenter createPresenter(RecipeService recipeService) {
-        return new CategoryPresenter(this, recipeService);
+        return new CategoryPresenter(recipeService);
     }
 
     protected void initComponents() {
         JPanel topPanel = new JPanel(new BorderLayout(10, 0));
-        topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         inputField = new JTextField();
         JButton searchButton = new JButton(IconHelper.getSearchOnIcon());
+        JPanel categoryPanel = buildCategoryPanel();
+        JPanel headerPanel = new JPanel();
 
-        ActionListener searchAction = e -> searchCurrentCard(inputField.getText().trim());
-        inputField.addActionListener(searchAction);
-        searchButton.addActionListener(searchAction);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        topPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
+
+        categoryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         topPanel.add(inputField, BorderLayout.CENTER);
         topPanel.add(searchButton, BorderLayout.EAST);
 
-        JPanel categoryPanel = buildCategoryPanel();
-
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        topPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         headerPanel.add(topPanel);
-
-        categoryPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         headerPanel.add(categoryPanel);
         headerPanel.add(Box.createVerticalStrut(2));
-
         add(headerPanel, BorderLayout.NORTH);
+
+        ActionListener searchAction = e -> searchCurrentCard(inputField.getText().trim());
+        inputField.addActionListener(searchAction);
+        searchButton.addActionListener(searchAction);
 
         cardLayout = new CardLayout();
         cards = new JPanel(cardLayout);
