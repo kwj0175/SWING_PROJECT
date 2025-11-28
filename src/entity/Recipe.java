@@ -13,7 +13,7 @@ public class Recipe {
     private final String amount;
     private final String time;
     private final String imagePath;
-    private Boolean favorite;
+    private boolean favorite;
 
     public Recipe(String name, String title,
                   FoodCategory category, List<String> details,
@@ -46,10 +46,6 @@ public class Recipe {
     public List<String> getDetails() { return details; }
     public String[] getSteps() { return steps; }
     public String getImagePath() { return imagePath; }
-
-    public boolean checkCat(FoodCategory category) {
-        return this.getCategory().equals(category);
-    }
 
     public int matchScore(Set<String> userDetails) {
         int score = 0;
