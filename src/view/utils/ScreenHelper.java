@@ -27,12 +27,6 @@ public class ScreenHelper {
         return btn;
     }
 
-    public static JButton secondaryButton(String text, int x, int y, int width, int height) {
-        JButton button = new JButton(text);
-        button.setBounds(50, 300, 180, 100);
-        return button;
-    }
-
     public static JPanel cardPanel() {
         JPanel panel = new JPanel();
         panel.setOpaque(true);
@@ -48,10 +42,6 @@ public class ScreenHelper {
         JPanel panel = new JPanel();
         panel.setOpaque(true);
         panel.setBackground(Color.decode("#F9FFFD"));
-//        BorderFactory.createCompoundBorder(
-//                BorderFactory.createLineBorder(new Color(0x97C1A9), 1, true),
-//                BorderFactory.createEmptyBorder(16, 20, 16, 20)
-//        );
         panel.setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
         return panel;
     }

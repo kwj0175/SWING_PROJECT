@@ -9,11 +9,6 @@ public class BottomNavigation extends JPanel{
     private final NavigationHandler handler;
     private final JPanel navigationPanel;
 
-    private JButton homeButton;
-    private JButton menuButton;
-    private JButton plannerButton;
-    private JButton favoriteButton;
-
     public BottomNavigation(NavigationHandler handler) {
         this.handler = handler;
         setLayout(new BorderLayout());
@@ -35,6 +30,7 @@ public class BottomNavigation extends JPanel{
         button.setContentAreaFilled(false);
         button.setFocusPainted(false);
         button.setOpaque(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return button;
     }
 
@@ -45,15 +41,15 @@ public class BottomNavigation extends JPanel{
     }
 
     private JPanel createNavigationPanel() {
-        homeButton = buildButton(IconHelper.getHomeOnIcon());
-        menuButton = buildButton(IconHelper.getMenuOnIcon());
-        plannerButton = buildButton(IconHelper.getCalendarOnIcon());
-        favoriteButton = buildButton(IconHelper.getFavoriteOnIcon());
+        JButton homeButton = buildButton(IconHelper.getHomeOnIcon());
+        JButton menuButton = buildButton(IconHelper.getMenuOnIcon());
+        JButton plannerButton = buildButton(IconHelper.getCalendarOnIcon());
+        JButton favoriteButton = buildButton(IconHelper.getFavoriteOnIcon());
 
-        hoverIcon(homeButton, (ImageIcon)homeButton.getIcon(), IconHelper.getHomeOffIcon());
-        hoverIcon(menuButton, (ImageIcon)menuButton.getIcon(), IconHelper.getMenuOffIcon());
-        hoverIcon(plannerButton, (ImageIcon)plannerButton.getIcon(), IconHelper.getCalendarOffIcon());
-        hoverIcon(favoriteButton, (ImageIcon)favoriteButton.getIcon(), IconHelper.getFavoriteOffIcon());
+        hoverIcon(homeButton, (ImageIcon) homeButton.getIcon(), IconHelper.getHomeOffIcon());
+        hoverIcon(menuButton, (ImageIcon) menuButton.getIcon(), IconHelper.getMenuOffIcon());
+        hoverIcon(plannerButton, (ImageIcon) plannerButton.getIcon(), IconHelper.getCalendarOffIcon());
+        hoverIcon(favoriteButton, (ImageIcon) favoriteButton.getIcon(), IconHelper.getFavoriteOffIcon());
 
         JPanel panel = new JPanel(new GridLayout(1, 4, 5, 5));
 

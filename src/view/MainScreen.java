@@ -19,7 +19,6 @@ import src.view.recipe.RecipeView;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class MainScreen extends JFrame implements NavigationHandler {
     public static final int DISPLAY_WIDTH = 360;
@@ -35,8 +34,6 @@ public class MainScreen extends JFrame implements NavigationHandler {
     private final RecipeView recipeView;
     private final BottomNavigation bottomNavigation;
     private final FavoriteView favoriteView;
-
-    private final ArrayList<Recipe> recipes = new ArrayList<>();
 
     public MainScreen() {
         setTitle("MySmartRecipe");
@@ -87,16 +84,24 @@ public class MainScreen extends JFrame implements NavigationHandler {
         cardLayout.show(cardPanel, "Home");
     }
 
+    @Override
     public void displayHomeScreen() {
         cardLayout.show(cardPanel, "Home");
     }
 
+    @Override
     public void displayPlannerScreen() {
         cardLayout.show(cardPanel, "Planner");
     }
 
+    @Override
     public void displayCategoryScreen() {
         cardLayout.show(cardPanel, "Category");
+    }
+
+    @Override
+    public void displayFavoriteScreen() {
+        cardLayout.show(cardPanel, "Favorite");
     }
 
     public void displayRecipeDetail(Recipe recipe) {
@@ -107,10 +112,6 @@ public class MainScreen extends JFrame implements NavigationHandler {
     public void displayPlannerScreenWithRecipe(Recipe recipe) {
         plannerView.startOverlayAddMode(recipe);
         cardLayout.show(cardPanel, "Planner");
-    }
-
-    public void displayFavoriteScreen() {
-        cardLayout.show(cardPanel, "Favorite");
     }
 
     public void refreshFavoriteScreen() {

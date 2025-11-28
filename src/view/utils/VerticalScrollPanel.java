@@ -22,13 +22,11 @@ public class VerticalScrollPanel extends JPanel implements Scrollable {
 
     @Override
     public boolean getScrollableTracksViewportWidth() {
-        // 뷰포트의 가로 크기를 따라가도록
         return true;
     }
 
     @Override
     public boolean getScrollableTracksViewportHeight() {
-        // 세로는 내용만큼 커지고, 부족한 부분만 스크롤
         return false;
     }
 }

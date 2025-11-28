@@ -7,9 +7,8 @@ public class ImagePanel extends JPanel {
     private final Image backgroundImage;
 
     public ImagePanel(String imagePath) {
-//        System.out.println("Image path: " + imagePath);
         ImageIcon icon = new ImageIcon(imagePath);
-        backgroundImage = icon.getImage().getScaledInstance(320, 200, Image.SCALE_SMOOTH);
+        backgroundImage = icon.getImage();
         setOpaque(false);
     }
 
