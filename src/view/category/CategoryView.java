@@ -18,7 +18,7 @@ public class CategoryView extends JPanel {
     protected JPanel cards;
     protected CardLayout cardLayout;
     protected CategoryPresenter categoryPresenter;
-    
+
     private JTextField inputField;
 
     public CategoryView(MainScreen mainScreen, RecipeService recipeService) {

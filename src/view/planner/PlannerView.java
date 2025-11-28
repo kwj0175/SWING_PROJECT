@@ -11,7 +11,7 @@ import java.util.List;
 import java.awt.event.*;
 
 public class PlannerView extends JPanel {
-    private final String[] ROWS = {"아침", "점심", "저녁"};
+    private static final String[] ROWS = {"아침", "점심", "저녁"};
     private final PlannerPresenter plannerPresenter;
     private final MainScreen mainScreen;
     private final RecipeService recipeService;
@@ -319,27 +319,45 @@ public class PlannerView extends JPanel {
                 if (SwingUtilities.isRightMouseButton(e)) {
                     if (isAddMode) return;
                     if (existingRecipe != null) {
-                        JPopupMenu popup = new JPopupMenu();
-                        JMenuItem deleteItem = new JMenuItem("삭제하기");
-                        JMenuItem viewDetailItem = new JMenuItem("상세보기");
-
-                        deleteItem.addActionListener(ae -> {
-                            table.setValueAt("", row, col);
-                            plannerPresenter.removeRecipeAt(row, col);
-                            resetRecipeAlarm();
-                        });
-
-                        viewDetailItem.addActionListener(ae -> {
-                            mainScreen.displayRecipeDetail(existingRecipe);
-                        });
-
-                        popup.add(viewDetailItem);
-                        popup.add(deleteItem);
+                        JPopupMenu popup = getPopupMenu(row, col, existingRecipe);
                         popup.show(table, e.getX(), e.getY());
                     }
                 }
             }
         });
+    }
+
+    private JPopupMenu getPopupMenu(int row, int col, Recipe existingRecipe) {
+        JPopupMenu popup = new JPopupMenu();
+        JMenuItem deleteItem = new JMenuItem("삭제하기");
+        JMenuItem viewDetailItem = new JMenuItem("상세보기");
+
+        deleteItem.addActionListener(ae -> {
+            table.setValueAt("", row, col);
+            plannerPresenter.removeRecipeAt(row, col);
+            resetRecipeAlarm();
+        });
+
+        viewDetailItem.addActionListener(ae -> {
+            mainScreen.displayRecipeDetail(existingRecipe);
+        });
+
+        popup.add(viewDetailItem);
+        popup.add(deleteItem);
+        return popup;
+    }
+
+    private JDialog createDialog() {
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "레시피 선택", true);
+        dialog.setSize(400, 500);
+        dialog.setLocationRelativeTo(this);
+        return dialog;
+    }
+
+    private JPanel createMainPanel() {
+        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        return mainPanel;
     }
 
     private void showRecipeSelectionDialog(int row, int col) {
@@ -353,16 +371,12 @@ public class PlannerView extends JPanel {
             return;
         }
 
-        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "레시피 선택", true);
-        dialog.setSize(400, 500);
-        dialog.setLocationRelativeTo(this);
-
-        JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-
+        JDialog dialog = createDialog();
+        JPanel mainPanel = createMainPanel();
         JPanel searchPanel = new JPanel(new BorderLayout(5, 5));
         JTextField searchField = new JTextField();
         JButton searchBtn = new JButton("검색");
+
         searchPanel.add(new JLabel("레시피 검색:"), BorderLayout.WEST);
         searchPanel.add(searchField, BorderLayout.CENTER);
         searchPanel.add(searchBtn, BorderLayout.EAST);
@@ -370,20 +384,7 @@ public class PlannerView extends JPanel {
         DefaultListModel<Recipe> listModel = new DefaultListModel<>();
         allRecipes.forEach(listModel::addElement);
 
-        JList<Recipe> recipeList = new JList<>(listModel);
-        recipeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        recipeList.setCellRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value,
-                                                          int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Recipe) {
-                    Recipe recipe = (Recipe) value;
-                    setText(recipe.getName() + " [" + recipe.getCategory().getDisplayName() + "]");
-                }
-                return this;
-            }
-        });
+        JList<Recipe> recipeList = createRecipeList(listModel);
 
         JScrollPane scrollPane = new JScrollPane(recipeList);
 
@@ -428,6 +429,23 @@ public class PlannerView extends JPanel {
 
         dialog.add(mainPanel);
         dialog.setVisible(true);
+    }
+
+    private JList<Recipe> createRecipeList(DefaultListModel<Recipe> listModel) {
+        JList<Recipe> recipeList = new JList<>(listModel);
+        recipeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        recipeList.setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Recipe recipe) {
+                    setText(recipe.getName() + " [" + recipe.getCategory().getDisplayName() + "]");
+                }
+                return this;
+            }
+        });
+        return recipeList;
     }
 
     private void displayRecipeInfo(int row, int col, Recipe recipe) {
