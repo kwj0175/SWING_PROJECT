@@ -29,7 +29,7 @@ public class RecipePresenter {
         return result.toArray(new String[0]);
     }
 
-    public void setFavoriteRecipe(Recipe recipe) {
+    public void toggleFavorite(Recipe recipe) {
         recipe.setFavorite(!recipe.getFavorite());
     }
 

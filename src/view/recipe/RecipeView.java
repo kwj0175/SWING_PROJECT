@@ -45,9 +45,7 @@ public class RecipeView extends JPanel {
         add(form, BorderLayout.CENTER);
     }
 
-    /* ---------- 공통 버튼 빌더 (아이콘 버튼) ---------- */
-
-    private JPanel buildButton(ImageIcon icon) {
+    private JButton buildButton(ImageIcon icon) {
         JButton button = new JButton();
         if (icon != null) {
             button.setIcon(icon);
@@ -58,38 +56,54 @@ public class RecipeView extends JPanel {
         button.setFocusPainted(false);
         button.setPreferredSize(new Dimension(30, 30));
 
+        return button;
+    }
+
+    private JPanel wrapButtons(JButton button) {
         JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         wrapper.setOpaque(false);
         wrapper.add(button);
-
         return wrapper;
     }
 
-    /* ---------- 제목 / 버튼 / 이미지 / 인분·시간 ---------- */
-
     private JPanel buildNamePanel() {
-        // 제목 글자 키움
+        JPanel namePanel = ScreenHelper.cardPanel();
+        namePanel.setLayout(new BorderLayout());
+
+        JButton favBtn = buildButton(IconHelper.getSFavoriteOnIcon());
+        JButton addBtn = buildButton(IconHelper.getSCalendarOnIcon());
+        JPanel favBtnWrapper = wrapButtons(favBtn);
+        JPanel addBtnWrapper   = wrapButtons(addBtn);
+
         nameLabel = ScreenHelper.setText("", TITLE_FONT_SIZE);
         nameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-        // 즐겨찾기 / 플래너 추가 버튼 (아이콘 사용)
-        JPanel favoriteBtnWrapper = buildButton(IconHelper.getSFavoriteOnIcon());
-        JPanel recipeAddWrapper   = buildButton(IconHelper.getSCalendarOnIcon());
+        favoriteBtnClicked(favBtnWrapper);
+        addBtnClicked(addBtnWrapper);
 
-        // 즐겨찾기 버튼: 콘솔 출력만
-        Component[] favComps = favoriteBtnWrapper.getComponents();
+        namePanel.add(favBtnWrapper, BorderLayout.WEST);
+        namePanel.add(addBtnWrapper, BorderLayout.EAST);
+        namePanel.add(nameLabel, BorderLayout.CENTER);
+
+        return namePanel;
+    }
+
+    private void favoriteBtnClicked(JPanel favBtnWrapper) {
+        Component[] favComps = favBtnWrapper.getComponents();
         if (favComps.length > 0 && favComps[0] instanceof JButton favBtn) {
             favBtn.setRolloverEnabled(true);
             favBtn.setRolloverIcon(IconHelper.getSFavoriteOffIcon());
 
             favBtn.addActionListener(e -> {
                 System.out.println("[즐겨찾기 버튼 클릭] " + nameLabel.getText());
-                recipePresenter.setFavoriteRecipe(currentRecipe);
+                recipePresenter.toggleFavorite(currentRecipe);
                 mainScreen.refreshFavoriteScreen();
             });
         }
-        
-        Component[] addComps = recipeAddWrapper.getComponents();
+    }
+
+    private void addBtnClicked(JPanel addBtnWrapper) {
+        Component[] addComps = addBtnWrapper.getComponents();
         if (addComps.length > 0 && addComps[0] instanceof JButton addBtn) {
             addBtn.setRolloverEnabled(true);
             addBtn.setRolloverIcon(IconHelper.getSCalendarOffIcon());
@@ -103,15 +117,6 @@ public class RecipeView extends JPanel {
                 }
             });
         }
-
-        JPanel namePanel = ScreenHelper.cardPanel();
-        namePanel.setLayout(new BorderLayout());
-
-        namePanel.add(favoriteBtnWrapper, BorderLayout.WEST);
-        namePanel.add(recipeAddWrapper, BorderLayout.EAST);
-        namePanel.add(nameLabel, BorderLayout.CENTER);
-
-        return namePanel;
     }
 
     private void buildImgPanel() {
@@ -122,7 +127,6 @@ public class RecipeView extends JPanel {
     }
 
     private JPanel buildAmountTimePanel() {
-        
         amountLabel = ScreenHelper.setText("", AMOUNT_TIME_FONT_SIZE);
         timeLabel   = ScreenHelper.setText("", AMOUNT_TIME_FONT_SIZE);
 
@@ -149,8 +153,6 @@ public class RecipeView extends JPanel {
 
         return amountTimePanel;
     }
-
-    /* ---------- 재료 / 조리방법 패널 ---------- */
 
     private void buildDetailsPanel() {
         detailsPanel = new JPanel(new GridLayout(0, 2, 8, 8));
@@ -180,21 +182,27 @@ public class RecipeView extends JPanel {
         return area;
     }
 
-    /* ---------- 전체 폼 + 스크롤 ---------- */
-
-    private JPanel buildForm() {
+    private JPanel createRootPanel() {
         JPanel root = ScreenHelper.cardPanel();
         root.setBorder(BorderFactory.createEmptyBorder(30, 20, 10, 20));
         root.setLayout(new BorderLayout());
+        return root;
+    }
 
-        
+    private JPanel createHeaderPanel() {
         JPanel header = new JPanel();
         header.setOpaque(false);
-        GroupLayout headerLayout = ScreenHelper.groupLayout(header);
+        return header;
+    }
 
+    private JPanel buildForm() {
+        JPanel root = createRootPanel();
+        JPanel header = createHeaderPanel();
         JPanel namePanel = buildNamePanel();
-        buildImgPanel();
         JPanel amountTimePanel = buildAmountTimePanel();
+
+        buildImgPanel();
+        GroupLayout headerLayout = ScreenHelper.groupLayout(header);
 
         headerLayout.setHorizontalGroup(
                 headerLayout.createParallelGroup(GroupLayout.Alignment.CENTER)
@@ -212,7 +220,6 @@ public class RecipeView extends JPanel {
                         .addComponent(amountTimePanel)
         );
 
-        // 재료 / 조리방법
         buildDetailsPanel();
         buildStepsPanel();
 
@@ -226,7 +233,6 @@ public class RecipeView extends JPanel {
         content.add(Box.createVerticalStrut(8));
         content.add(stepsPanel);
 
-        
         scrollPane = new JScrollPane(content);
         scrollPane.setBorder(null);
         scrollPane.setOpaque(false);
@@ -275,13 +281,10 @@ public class RecipeView extends JPanel {
         });
     }
 
-    /* ---------- 외부에서 레시피 세팅 ---------- */
-
     public void setRecipe(Recipe recipe) {
         this.currentRecipe = recipe;
         recipePresenter.showRecipe(recipe);
 
-        
         SwingUtilities.invokeLater(() -> {
             if (scrollPane != null) {
                 scrollPane.getVerticalScrollBar().setValue(0);
@@ -289,16 +292,12 @@ public class RecipeView extends JPanel {
         });
     }
 
-    /* ---------- 뷰 업데이트 ---------- */
-
     void updateRecipeView(String name, String imagePath,
                           String amount, String time,
                           List<String> details, String[] steps) {
 
-        // 제목
         nameLabel.setText(name != null ? name : "");
 
-        // 이미지
         imgPanel.removeAll();
         if (imagePath != null && !imagePath.isEmpty()) {
             imgPanel.add(new ImagePanel(imagePath), BorderLayout.CENTER);
@@ -306,11 +305,9 @@ public class RecipeView extends JPanel {
         imgPanel.revalidate();
         imgPanel.repaint();
 
-        // 인분/시간
         amountLabel.setText(amount != null ? amount : "");
         timeLabel.setText(time != null ? time : "");
 
-        // 재료
         detailsPanel.removeAll();
         if (details != null) {
             for (String data : details) {
@@ -322,7 +319,6 @@ public class RecipeView extends JPanel {
         detailsPanel.revalidate();
         detailsPanel.repaint();
 
-        // 조리방법
         stepsPanel.removeAll();
         if (steps != null) {
             boolean first = true;
@@ -335,7 +331,6 @@ public class RecipeView extends JPanel {
                 JComponent comp = createMultiLineText(text);
                 comp.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-               
                 if (!first) {
                     stepsPanel.add(Box.createVerticalStrut(STEP_GAP));
                 }
