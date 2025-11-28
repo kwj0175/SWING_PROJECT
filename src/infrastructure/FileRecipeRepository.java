@@ -56,13 +56,7 @@ public class FileRecipeRepository implements RecipeRepository {
     }
 
     private String resolveImageDir(FoodCategory foodCategory) {
-        return switch (foodCategory) {
-            case MAIN_SIDE_DISH -> "main_side_dishes";
-            case SIDE_DISH -> "side_dishes";
-            case SOUP -> "soups";
-            case RICE_DISH -> "rice_dishes";
-            default -> foodCategory.name().toLowerCase();
-        };
+        return foodCategory.getFilePrefix();
     }
 
     private Recipe parseData(String line, FoodCategory foodCategory) {

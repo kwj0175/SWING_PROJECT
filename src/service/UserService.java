@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
-    private List<User> userList = new ArrayList<>();
+    private final List<User> userList;
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {

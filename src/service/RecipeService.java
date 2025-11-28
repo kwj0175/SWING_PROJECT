@@ -40,24 +40,6 @@ public class RecipeService {
         return Collections.unmodifiableList(favorites);
     }
 
-    public List<Recipe> getFavoriteRecipes() {
-        List<Recipe> favorites = new ArrayList<>();
-
-        for (FoodCategory cat : FoodCategory.values()) {
-            List<Recipe> catRecipes = recipesByCategory.get(cat);
-            if (catRecipes == null || catRecipes.isEmpty()) continue;
-
-            for (Recipe recipe : catRecipes) {
-                if (recipe.getFavorite()) {
-                    favorites.add(recipe);
-                }
-            }
-        }
-
-        return Collections.unmodifiableList(favorites);
-    }
-
-
     public List<Recipe> getRecipesByCategory(FoodCategory category) {
         List<Recipe> list = recipesByCategory.get(category);
         if (list == null) return List.of();
@@ -84,14 +66,10 @@ public class RecipeService {
         for (String key : keywords) {
             String norm = key.trim();
             if (!norm.isEmpty()) set.add(norm);
-            System.out.println(norm);
         }
         return set;
     }
 
-    // 입력 없음 OR 점수 0 -> 랜덤
-    // 점수 가장 높은 레시피 pick
-    // 같은 점수끼리는 랜덤
     private Recipe pickBestRecipe(List<Recipe> candidates, Set<String> userSet) {
         if (userSet.isEmpty()) {
             return candidates.get(random.nextInt(candidates.size()));
