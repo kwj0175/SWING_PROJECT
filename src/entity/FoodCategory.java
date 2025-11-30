@@ -18,6 +18,10 @@ public enum FoodCategory {
         return displayName;
     }
 
+    public String getFilePrefix() {
+        return filePrefix;
+    }
+
     public static FoodCategory from(String fileName) {
         for (FoodCategory f : values()) {
             if (fileName.startsWith(f.filePrefix)) return f;
